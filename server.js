@@ -428,37 +428,29 @@ const intervalo = setInterval(() => {
 });
 
 
-app.post("/webhook", async (req, res) => {
+app.post('/webhook', async (req, res) => {
+  res.sendStatus(200);
+
+  console.log("BODY:", req.body);
+
+  // 🚨 FILTRO CRÍTICO
+  if (req.body.type !== 'payment') {
+    console.log("⛔ Ignorado:", req.body.type);
+    return;
+  }
+
+  const paymentId = req.body?.data?.id;
+
+  console.log("🧠 ID:", paymentId);
+
+  if (!paymentId) {
+    console.log("❌ Sem paymentId");
+    return;
+  }
+
   try {
-    const data = req.body;
-
-    console.log("WEBHOOK RECEBIDO:", JSON.stringify(req.body, null, 2));
-    console.log("QUERY:", req.query);
-    console.log(data);
-
-    // 🧠 Extrair ID corretamente
-    let pagamentoId =
-      data?.data?.id ||
-      data?.id ||
-      data?.resource;
-
-    // 🔥 Se vier URL, extrai o ID
-    if (typeof pagamentoId === "string" && pagamentoId.includes("/")) {
-      pagamentoId = pagamentoId.split("/").pop();
-    }
-
-    console.log("💳 ID EXTRAÍDO:", pagamentoId);
-
-    if (!pagamentoId) {
-      return res.sendStatus(200);
-    }
-
-    // ⏳ pequeno delay (MP às vezes demora atualizar)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // 🔍 consulta pagamento real
     const response = await axios.get(
-      `https://api.mercadopago.com/v1/payments/${pagamentoId}`,
+      `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.ACCESS_TOKEN}`
@@ -468,29 +460,14 @@ app.post("/webhook", async (req, res) => {
 
     const status = response.data.status;
 
-    console.log("💰 STATUS REAL:", status);
+    console.log("🔥 STATUS REAL:", status);
 
-    // ✅ salva no banco
-    await Pagamento.findOneAndUpdate(
-      { pagamentoId: pagamentoId },
-      {
-        status: status,
-        atualizadoEm: new Date()
-      },
-      { upsert: true } // cria se não existir
-    );
-
-    // 🔥 ação quando aprovado
-    if (status === "approved") {
-      console.log("✅ PAGAMENTO CONFIRMADO!");
+    if (status === 'approved') {
+      console.log("✅ PAGAMENTO APROVADO");
     }
 
-    res.sendStatus(200);
-
-  } catch (error) {
-    console.error("❌ ERRO WEBHOOK:");
-    console.log(error.response?.data || error.message);
-    res.sendStatus(500);
+  } catch (err) {
+    console.error("ERRO AO CONSULTAR:", err.message);
   }
 });
 
