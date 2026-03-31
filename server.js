@@ -1,4 +1,5 @@
 require('dotenv').config()
+console.log("🚀 SERVIDOR NOVO RODANDO");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
 const mongoose = require('mongoose');
 const express = require("express");
@@ -431,22 +432,14 @@ const intervalo = setInterval(() => {
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 
-  console.log("BODY:", req.body);
+  console.log("BODY:", JSON.stringify(req.body));
 
-  // 🚨 FILTRO CRÍTICO
-  if (req.body.type !== 'payment') {
-    console.log("⛔ Ignorado:", req.body.type);
+  if (!req.body || !req.body.data || !req.body.data.id) {
+    console.log("❌ SEM ID");
     return;
   }
 
-  const paymentId = req.body?.data?.id;
-
-  console.log("🧠 ID:", paymentId);
-
-  if (!paymentId) {
-    console.log("❌ Sem paymentId");
-    return;
-  }
+  const paymentId = req.body.data.id;
 
   try {
     const response = await axios.get(
@@ -464,10 +457,12 @@ app.post('/webhook', async (req, res) => {
 
     if (status === 'approved') {
       console.log("✅ PAGAMENTO APROVADO");
+    } else {
+      console.log("⏳ AINDA NÃO APROVADO:", status);
     }
 
   } catch (err) {
-    console.error("ERRO AO CONSULTAR:", err.message);
+    console.error("❌ ERRO:", err.response?.data || err.message);
   }
 });
 
