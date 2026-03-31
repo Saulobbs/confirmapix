@@ -1,5 +1,6 @@
 require('dotenv').config()
 console.log("🚀 SERVIDOR NOVO RODANDO");
+console.log("🔥 TESTE ALTERAÇÃO");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
 const mongoose = require('mongoose');
 const express = require("express");
