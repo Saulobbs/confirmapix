@@ -432,7 +432,8 @@ app.post("/webhook", async (req, res) => {
   try {
     const data = req.body;
 
-    console.log("🔔 WEBHOOK RECEBIDO:");
+    console.log("WEBHOOK RECEBIDO:", JSON.stringify(req.body, null, 2));
+    console.log("QUERY:", req.query);
     console.log(data);
 
     // 🧠 Extrair ID corretamente
