@@ -433,14 +433,22 @@ const intervalo = setInterval(() => {
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 
-  console.log("BODY:", JSON.stringify(req.body));
+  console.log("📩 BODY:", req.body);
 
-  if (!req.body || !req.body.data || !req.body.data.id) {
-    console.log("❌ SEM ID");
+  let paymentId = req.body?.data?.id;
+
+  // 🔥 fallback se vier como resource
+  if (!paymentId && req.body?.resource) {
+    const parts = req.body.resource.split('/');
+    paymentId = parts[parts.length - 1];
+  }
+
+  if (!paymentId) {
+    console.log("❌ ID NÃO ENCONTRADO");
     return;
   }
 
-  const paymentId = req.body.data.id;
+  console.log("🧾 PAYMENT ID:", paymentId);
 
   try {
     const response = await axios.get(
@@ -458,12 +466,10 @@ app.post('/webhook', async (req, res) => {
 
     if (status === 'approved') {
       console.log("✅ PAGAMENTO APROVADO");
-    } else {
-      console.log("⏳ AINDA NÃO APROVADO:", status);
     }
 
   } catch (err) {
-    console.error("❌ ERRO:", err.response?.data || err.message);
+    console.error("ERRO AO CONSULTAR:", err.response?.data || err.message);
   }
 });
 
