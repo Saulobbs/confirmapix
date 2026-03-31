@@ -1,4 +1,11 @@
 require('dotenv').config()
+process.on('uncaughtException', err => {
+  console.error('💥 ERRO CRASH:', err);
+});
+
+process.on('unhandledRejection', err => {
+  console.error('💥 PROMISE CRASH:', err);
+});
 console.log("🚀 SERVIDOR NOVO RODANDO");
 console.log("🔥 TESTE ALTERAÇÃO");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
