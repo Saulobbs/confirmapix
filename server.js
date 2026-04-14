@@ -344,7 +344,7 @@ document.querySelector(".card").appendChild(statusText);
 
 async function verificarStatus() {
   try {
-    const response = await fetch(\`/status?pagamentoId=\${pagamentoId}\`);
+    const response = await fetch("https://confirmapix-production-5154.up.railway.app/status?pagamentoId=" + pagamentoId);
     const data = await response.json();
 
     console.log("STATUS ATUAL:", data.status);
