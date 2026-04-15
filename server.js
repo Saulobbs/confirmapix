@@ -10,6 +10,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get('/', (req, res) => {
+  res.send('OK FUNCIONANDO');
+});
+
 // 🔹 GET só pra teste (NÃO quebra mais)
 app.get("/webhook", (req, res) => {
   res.send("Webhook OK");
