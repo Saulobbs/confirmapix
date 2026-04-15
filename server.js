@@ -1,6 +1,7 @@
 require('dotenv').config()
 console.log("🔥 ALTEREI ISSO AGORA 🔥");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
+console.log('TESTE 123');
 const mongoose = require('mongoose');
 const express = require("express");
 const axios = require("axios");
@@ -9,6 +10,10 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+app.get('/', (req, res) => {
+  res.send('AGORA FOI');
+});
 
 app.get('/', (req, res) => {
   res.send('OK FUNCIONANDO');
