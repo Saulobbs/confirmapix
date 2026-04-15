@@ -49,7 +49,7 @@ app.get("/pix", async (req, res) => {
     payer: {
       email: "teste@test.com"
     },
-    notification_url: `https://keisha-peremptory-meta.ngrok-free.dev/webhook`
+    notification_url:`https://confirmapix-production-5154.up.railway.app/webhoo`
   },
   {
     headers: {
@@ -306,15 +306,7 @@ const intervalo = setInterval(() => {
 
 app.post("/webhook", async (req, res) => {
   try {
-    const data = req.body;
-
-    console.log("BODY COMPLETO:", data);
-
-    const pagamentoId = Number(
-  data?.data?.id ||
-  data?.id ||
-  data?.resource
-);
+    const pagamentoId = req.body?.data?.id;
 
     console.log("ID:", pagamentoId);
 
@@ -322,7 +314,7 @@ app.post("/webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    // 🔥 ESPERA (IMPORTANTE)
+    // 🔥 espera 2 segundos (IMPORTANTE)
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const pagamento = await axios.get(
@@ -337,9 +329,9 @@ app.post("/webhook", async (req, res) => {
     console.log("STATUS:", pagamento.data.status);
 
     await Pagamento.findOneAndUpdate(
-  { pagamentoId: pagamentoId },
-  { status: pagamento.data.status }
-);
+      { pagamentoId },
+      { status: pagamento.data.status }
+    );
 
     res.sendStatus(200);
 
@@ -348,7 +340,6 @@ app.post("/webhook", async (req, res) => {
     res.sendStatus(500);
   }
 });
-
 app.get("/status", async (req, res) => {
   try {
     const pagamentoId = Number(req.query.pagamentoId);
