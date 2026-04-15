@@ -1,4 +1,5 @@
 require('dotenv').config()
+console.log("🔥 ALTEREI ISSO AGORA 🔥");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
 const mongoose = require('mongoose');
 const express = require("express");
