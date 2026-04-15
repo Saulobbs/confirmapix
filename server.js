@@ -14,24 +14,9 @@ app.get("/webhook", (req, res) => {
   res.send("Webhook OK");
 });
 
-// 🔹 POST real (Mercado Pago)
-app.post("/webhook", async (req, res) => {
-  try {
-    console.log("🔥 WEBHOOK RECEBIDO");
-    console.log("BODY:", req.body);
-
-    const pagamentoId = req.body?.data?.id;
-
-    if (!pagamentoId) {
-      return res.sendStatus(200);
-    }
-
-    res.sendStatus(200); // responde rápido SEMPRE
-
-  } catch (error) {
-    console.error("ERRO WEBHOOK:", error);
-    res.sendStatus(200); // NUNCA derruba o servidor
-  }
+app.post("/webhook", (req, res) => {
+  console.log("WEBHOOK RECEBIDO");
+  res.sendStatus(200);
 });
 
 const Pagamento = require("./models/pagamento");
