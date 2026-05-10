@@ -490,7 +490,7 @@ app.post('/webhook', async (req, res) => {
 
 app.get("/status", async (req, res) => {
   try {
-    const pagamentoId = Number(req.query.pagamentoId);
+    const pagamentoId = req.query.pagamentoId;
 
     const pagamento = await Pagamento.findOne({ pagamentoId });
 
