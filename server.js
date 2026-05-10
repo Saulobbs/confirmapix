@@ -194,6 +194,7 @@ app.get("/pix", async (req, res) => {
   }
 );
 const pagamentoId = response.data.id;
+console.log("ID PIX:", pagamentoId);
     console.log("RESPOSTA MP:", response.data);
 
 let pixData = response.data.point_of_interaction?.transaction_data;
@@ -439,16 +440,14 @@ const intervalo = setInterval(() => {
 });
 
 
-app.get("/webhook", (req, res) => {
-  console.log("WEBHOOK GET RECEBIDO");
-  res.send("Webhook ativo");
-});
-
 app.post("/webhook", async (req, res) => {
+
+  res.sendStatus(200);
 
   console.log("WEBHOOK POST:", req.body);
 
-  
+  console.log("RESOURCE:", req.body?.resource);
+  console.log("DATA:", req.body?.data);
 
   try {
 
@@ -461,15 +460,6 @@ app.post("/webhook", async (req, res) => {
 
     console.log("PAYMENT ID:", paymentId);
 
-    // resto do seu código aqui
-
-  } catch (err) {
-    console.error("ERRO WEBHOOK:", err.response?.data || err.message);
-  }
-
-
-
-  try {
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -485,19 +475,17 @@ app.post("/webhook", async (req, res) => {
 
     if (status === 'approved') {
 
-  await Pagamento.findOneAndUpdate(
-    { pagamentoId: paymentId },
-    { status: 'approved' }
-  );
+      await Pagamento.findOneAndUpdate(
+        { pagamentoId: Number(paymentId) },
+        { status: 'approved' }
+      );
 
-  console.log("✅ PAGAMENTO APROVADO E ATUALIZADO");
-}
+      console.log("✅ PAGAMENTO APROVADO E ATUALIZADO");
+    }
 
   } catch (err) {
-    console.error("ERRO AO CONSULTAR:", err.response?.data || err.message);
+    console.error("ERRO WEBHOOK:", err.response?.data || err.message);
   }
-
-  res.sendStatus(200);
 
 });
 
