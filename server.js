@@ -13,6 +13,7 @@ console.log("🔥 TESTE ALTERAÇÃO");
 console.log("TOKEN:", process.env.ACCESS_TOKEN);
 const mongoose = require('mongoose');
 const express = require("express");
+console.log("🔥 SERVIDOR INICIANDO");
 const axios = require("axios");
 const cors = require("cors");
 
@@ -440,6 +441,10 @@ const intervalo = setInterval(() => {
 });
 
 
+app.get("/webhook", (req, res) => {
+  console.log("WEBHOOK GET RECEBIDO");
+  res.send("Webhook ativo");
+});
 app.post("/webhook", async (req, res) => {
 
   res.sendStatus(200);
