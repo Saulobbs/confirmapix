@@ -184,7 +184,7 @@ app.get("/pix", async (req, res) => {
     payer: {
       email: "teste@test.com"
     },
-    notification_url: "https://confirmapix.onrender.com/webhook/",
+    notification_url: "https://confirmapix.onrender.com/webhook"
   },
   {
     headers: {
