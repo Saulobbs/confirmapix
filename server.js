@@ -439,25 +439,35 @@ const intervalo = setInterval(() => {
 });
 
 
-app.post('/webhook', async (req, res) => {
-  res.sendStatus(200);
+app.get("/webhook", (req, res) => {
+  console.log("WEBHOOK GET RECEBIDO");
+  res.send("Webhook ativo");
+});
 
-  console.log("📩 BODY:", req.body);
+app.post("/webhook", async (req, res) => {
 
-  let paymentId = req.body?.data?.id;
+  console.log("WEBHOOK POST:", req.body);
 
-  // 🔥 fallback se vier como resource
-  if (!paymentId && req.body?.resource) {
-    const parts = req.body.resource.split('/');
-    paymentId = parts[parts.length - 1];
+  
+
+  try {
+
+    let paymentId = req.body?.data?.id;
+
+    if (!paymentId && req.body?.resource) {
+      const parts = req.body.resource.split('/');
+      paymentId = parts[parts.length - 1];
+    }
+
+    console.log("PAYMENT ID:", paymentId);
+
+    // resto do seu código aqui
+
+  } catch (err) {
+    console.error("ERRO WEBHOOK:", err.response?.data || err.message);
   }
 
-  if (!paymentId) {
-    console.log("❌ ID NÃO ENCONTRADO");
-    return;
-  }
 
-  console.log("🧾 PAYMENT ID:", paymentId);
 
   try {
     const response = await axios.get(
@@ -486,6 +496,9 @@ app.post('/webhook', async (req, res) => {
   } catch (err) {
     console.error("ERRO AO CONSULTAR:", err.response?.data || err.message);
   }
+
+  res.sendStatus(200);
+
 });
 
 app.get("/status", async (req, res) => {
