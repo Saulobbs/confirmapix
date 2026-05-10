@@ -19,6 +19,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const Pagamento = require("./models/pagamento");
@@ -441,29 +442,29 @@ const intervalo = setInterval(() => {
 });
 
 
-app.get("/webhook", (req, res) => {
-  console.log("WEBHOOK GET RECEBIDO");
-  res.send("Webhook ativo");
-});
 app.post("/webhook", async (req, res) => {
 
-  res.sendStatus(200);
-
-  console.log("WEBHOOK POST:", req.body);
-
-  console.log("RESOURCE:", req.body?.resource);
-  console.log("DATA:", req.body?.data);
+  console.log("🔥 WEBHOOK RECEBIDO");
+  console.log("BODY:", req.body);
+  console.log("QUERY:", req.query);
 
   try {
 
-    let paymentId = req.body?.data?.id;
+    let paymentId =
+      req.body?.data?.id ||
+      req.query["data.id"];
 
     if (!paymentId && req.body?.resource) {
-      const parts = req.body.resource.split('/');
+      const parts = req.body.resource.split("/");
       paymentId = parts[parts.length - 1];
     }
 
     console.log("PAYMENT ID:", paymentId);
+
+    if (!paymentId) {
+      console.log("❌ PAYMENT ID NÃO VEIO");
+      return res.sendStatus(200);
+    }
 
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
@@ -478,20 +479,28 @@ app.post("/webhook", async (req, res) => {
 
     console.log("🔥 STATUS REAL:", status);
 
-    if (status === 'approved') {
+    if (status === "approved") {
 
-      await Pagamento.findOneAndUpdate(
+      const atualizado = await Pagamento.findOneAndUpdate(
         { pagamentoId: Number(paymentId) },
-        { status: 'approved' }
+        { status: "approved" },
+        { new: true }
       );
 
-      console.log("✅ PAGAMENTO APROVADO E ATUALIZADO");
+      console.log("✅ ATUALIZADO:", atualizado);
     }
 
-  } catch (err) {
-    console.error("ERRO WEBHOOK:", err.response?.data || err.message);
-  }
+    return res.sendStatus(200);
 
+  } catch (err) {
+
+    console.error(
+      "❌ ERRO WEBHOOK:",
+      err.response?.data || err.message
+    );
+
+    return res.sendStatus(500);
+  }
 });
 
 app.get("/status", async (req, res) => {
