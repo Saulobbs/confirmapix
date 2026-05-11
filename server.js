@@ -18,10 +18,22 @@ app.use(express.urlencoded({ extended: true }));
 const axios = require("axios");
 const { MercadoPagoConfig } = require("mercadopago");
 const cors = require("cors");
-
+const session = require("express-session");
 app.use(express.json());
 app.use(cors());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+function verificarLogin(req, res, next) {
 
+  if (req.session.logado) {
+    return next();
+  }
+
+  return res.redirect("/login");
+}
 const Pagamento = require("./models/pagamento");
 
 const Merchant = require("./models/merchant");
@@ -191,7 +203,61 @@ atualizar();
   `);
 });
 
-app.get("/admin", (req, res) => {
+app.get("/login", (req, res) => {
+
+  res.send(`
+  
+  <form method="POST" action="/login" style="
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:300px;
+    margin:100px auto;
+  ">
+  
+    <h2>Login Admin</h2>
+
+    <input 
+      type="text" 
+      name="usuario" 
+      placeholder="Usuário"
+    />
+
+    <input 
+      type="password" 
+      name="senha" 
+      placeholder="Senha"
+    />
+
+    <button type="submit">
+      Entrar
+    </button>
+
+  </form>
+
+  `);
+
+});
+
+app.post("/login", (req, res) => {
+
+  const { usuario, senha } = req.body;
+
+  if (
+    usuario === "admin" &&
+    senha === "123456"
+  ) {
+
+    req.session.logado = true;
+
+    return res.redirect("/admin");
+  }
+
+  return res.send("Login inválido");
+
+});
+
+app.get("/admin", verificarLogin, (req, res) => {
 
 res.send(`
 
@@ -829,8 +895,7 @@ app.post("/webhook", async (req, res) => {
     }
 
     console.log("PAYMENT ID:", paymentId);
-
-    await new Promise(r => setTimeout(r, 2000));
+    
 
     if (!paymentId) {
       console.log("❌ PAYMENT ID NÃO VEIO");
