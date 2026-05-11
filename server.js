@@ -243,7 +243,7 @@ app.get("/pix", async (req, res) => {
   },
   {
     headers: {
-      Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+      Authorization: `Bearer ${loja.accessToken}`,
       "X-Idempotency-Key": Date.now().toString()
     }
   }
@@ -264,7 +264,7 @@ if (!pixData) {
     `https://api.mercadopago.com/v1/payments/${response.data.id}`,
     {
       headers: {
-        Authorization: `Bearer ${process.env.ACCESS_TOKEN}`
+        Authorization: `Bearer ${loja.accessToken}`
       }
     }
   );
@@ -823,7 +823,7 @@ app.post("/webhook", async (req, res) => {
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`
+          Authorization: `Bearer ${loja.accessToken}`,
         }
       }
     );
