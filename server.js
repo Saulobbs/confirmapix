@@ -190,6 +190,111 @@ atualizar();
   `);
 });
 
+app.get("/admin", (req, res) => {
+
+res.send(`
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Painel Admin</title>
+
+<style>
+
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card{
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  width:400px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:#2ecc71;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Criar Loja</h1>
+
+<form method="POST" action="/criar-loja">
+
+<input
+type="text"
+name="nome"
+placeholder="Nome da loja"
+required
+/>
+
+<input
+type="text"
+name="slug"
+placeholder="slug-da-loja"
+required
+/>
+
+<input
+type="text"
+name="accessToken"
+placeholder="Access Token Mercado Pago"
+required
+/>
+
+<button type="submit">
+Criar Loja
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
+
+`);
+
+});
+
 app.get("/:slug", async (req, res) => {
 
   const slug = req.params.slug;
