@@ -245,7 +245,7 @@ app.post("/login", (req, res) => {
 
   if (
     usuario === "admin" &&
-    senha === "123456"
+    senha === "@Sa241985confirmapix2026"
   ) {
 
     req.session.logado = true;
