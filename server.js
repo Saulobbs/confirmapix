@@ -627,7 +627,7 @@ app.post("/webhook", async (req, res) => {
       const atualizado = await Pagamento.findOneAndUpdate(
         { pagamentoId: Number(paymentId) },
         { status: "aprovado" },
-        { new: true }
+        { returnDocument: "after" }
       );
 
       console.log("✅ ATUALIZADO:", atualizado);
