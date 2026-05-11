@@ -304,7 +304,7 @@ const base64 = pixData.qr_code_base64;
 
     await Pagamento.create({
       valor: valor,
-      status: "pending",
+      status: "pendente",
       pix: copia,
       pagamentoId: response.data.id,
       email: "teste@test.com"
@@ -433,10 +433,10 @@ async function verificarStatus() {
 
     statusText.innerText = "Status: " + data.status;
 
-    if (data.status === "approved") {
+    if (data.status === "aprovado") {
       clearInterval(intervalo);
 
-      const card = document.querySelector(".card");
+      const card = document.querySelector(".card");   
 
       card.innerHTML = \`
       <div style="text-align:center;">
@@ -557,11 +557,11 @@ app.post("/webhook", async (req, res) => {
 
     console.log("🔥 STATUS REAL:", status);
 
-    if (status === "approved") {
+    if (status === "aprovado") {
 
       const atualizado = await Pagamento.findOneAndUpdate(
         { pagamentoId: Number(paymentId) },
-        { status: "approved" },
+        { status: "aprovado" },
         { new: true }
       );
 
@@ -581,10 +581,10 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-app.get("/status", async (req, res) => {
+app.get("/status/:paymentId", async (req, res) => {
   try {
 
-    const pagamentoId = Number(req.query.pagamentoId);
+    const pagamentoId = Number(req.params.paymentId);
 
     const pagamento = await Pagamento.findOne({ pagamentoId });
 
@@ -596,7 +596,7 @@ app.get("/status", async (req, res) => {
 
   } catch (err) {
     console.log("ERRO STATUS:", err);
-    return res.json({ status: "pending" });
+    return res.json({ status: "pendente" });
   }
 });
 // 🚀 SERVIDOR
