@@ -830,6 +830,8 @@ app.post("/webhook", async (req, res) => {
 
     console.log("PAYMENT ID:", paymentId);
 
+    await new Promise(r => setTimeout(r, 2000));
+
     if (!paymentId) {
       console.log("❌ PAYMENT ID NÃO VEIO");
       return res.sendStatus(200);
