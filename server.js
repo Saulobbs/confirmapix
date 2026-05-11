@@ -14,6 +14,7 @@ process.on('unhandledRejection', err => {
 const mongoose = require('mongoose');
 const express = require("express");
 const axios = require("axios");
+const { MercadoPagoConfig } = require("mercadopago");
 const cors = require("cors");
 const app = express();
 app.use(express.json());
