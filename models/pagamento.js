@@ -6,6 +6,7 @@ const PagamentoSchema = new mongoose.Schema({
   pix: String,
   pagamentoId: Number,
   email: String,
+  slug: String,
 
   criadoEm: {
     type: Date,
