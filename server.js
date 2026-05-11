@@ -36,24 +36,29 @@ mongoose.connect(process.env.MONGO_URI)
     slug: "lojateste"
   });
 
-  if (!existe) {
+  if (true) {
 
-    await Merchant.create({
+    await Merchant.findOneAndUpdate(
+      { slug: "lojateste" },
 
-      nome: "Loja Teste",
+      {
+        nome: "Loja Teste",
+        slug: "lojateste",
+        accessToken: "=APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
+      },
 
-      slug: "lojateste",
+      { upsert: true }
+    );
 
-      accessToken: "=APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
-
-    });
-
-    console.log("TOKEN DA LOJA:", loja.accessToken);
-
-    console.log("✅ LOJA TESTE CRIADA");
+    console.log("LOJA TESTE ATUALIZADA");
   }
 
 }
+
+    console.log("✅ LOJA TESTE CRIADA");
+  
+
+
 
 criarLojaTeste();
 
