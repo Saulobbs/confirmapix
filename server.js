@@ -55,10 +55,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 }
 
-    console.log("✅ LOJA TESTE CRIADA");
   
-
-
+  
 
 criarLojaTeste();
 
