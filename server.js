@@ -600,7 +600,8 @@ const base64 = pixData.qr_code_base64;
       status: "pendente",
       pix: copia,
       pagamentoId: response.data.id,
-      email: "teste@test.com"
+      email: "teste@test.com",
+      slug: loja.slug
     });
 
     console.log("✅ SALVO COM SUCESSO");
@@ -809,6 +810,7 @@ app.get("/webhook", (req, res) => {
 });
 
 console.log("🔥 REGISTRANDO WEBHOOK");
+
 app.post("/webhook", async (req, res) => {
 
   console.log("🔥 WEBHOOK RECEBIDO");
@@ -833,10 +835,27 @@ app.post("/webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    const loja = await Merchant.findOne({
-  slug: "lojateste"
-});
+    // BUSCA O PAGAMENTO NO BANCO
+    const pagamento = await Pagamento.findOne({
+      pagamentoId: Number(paymentId)
+    });
 
+    if (!pagamento) {
+      console.log("❌ PAGAMENTO NÃO ENCONTRADO");
+      return res.sendStatus(200);
+    }
+
+    // BUSCA A LOJA DO PAGAMENTO
+    const loja = await Merchant.findOne({
+      slug: pagamento.slug
+    });
+
+    if (!loja) {
+      console.log("❌ LOJA NÃO ENCONTRADA");
+      return res.sendStatus(200);
+    }
+
+    // CONSULTA STATUS REAL NO MERCADO PAGO
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -850,6 +869,7 @@ app.post("/webhook", async (req, res) => {
 
     console.log("🔥 STATUS REAL:", status);
 
+    // SE APROVADO
     if (status === "approved") {
 
       const atualizado = await Pagamento.findOneAndUpdate(
