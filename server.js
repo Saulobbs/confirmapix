@@ -491,7 +491,7 @@ document.querySelector(".card").appendChild(statusText);
 
 async function verificarStatus() {
   try {
-    const response = await fetch(\`/status?pagamentoId=\${pagamentoId}\`);
+    const response = await fetch(`/status/${pagamentoId}`);
     const data = await response.json();
 
     console.log("STATUS ATUAL:", data.status);
@@ -622,7 +622,7 @@ app.post("/webhook", async (req, res) => {
 
     console.log("🔥 STATUS REAL:", status);
 
-    if (status === "aprovado") {
+    if (status === "approved") {
 
       const atualizado = await Pagamento.findOneAndUpdate(
         { pagamentoId: Number(paymentId) },
