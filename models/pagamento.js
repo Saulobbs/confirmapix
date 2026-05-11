@@ -1,15 +1,18 @@
 const mongoose = require("mongoose");
 
 const PagamentoSchema = new mongoose.Schema({
-  pagamentoId: String,
-  status: String,
   valor: Number,
-  email: String,
+  status: String,
   pix: String,
-  criado_em: {
+  pagamentoId: Number,
+  email: String,
+
+  criadoEm: {
     type: Date,
     default: Date.now
-  }
+  },
+
+  aprovadoEm: Date
 });
 
 module.exports = mongoose.model("Pagamento", PagamentoSchema);
