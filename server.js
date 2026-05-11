@@ -44,7 +44,7 @@ mongoose.connect(process.env.MONGO_URI)
       {
         nome: "Loja Teste",
         slug: "lojateste",
-        accessToken: "=APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
+        accessToken: "APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
       },
 
       { upsert: true }
@@ -539,6 +539,10 @@ app.post("/webhook", async (req, res) => {
       console.log("❌ PAYMENT ID NÃO VEIO");
       return res.sendStatus(200);
     }
+
+    const loja = await Merchant.findOne({
+  slug: "lojateste"
+});
 
     const response = await axios.get(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
