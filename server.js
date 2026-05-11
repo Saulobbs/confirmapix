@@ -22,10 +22,37 @@ app.use(cors());
 
 const Pagamento = require("./models/pagamento");
 
+const Merchant = require("./models/merchant");
+
 // 🔥 CONEXÃO MONGO
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("🔥 MongoDB conectado"))
   .catch(err => console.error(err));
+
+  async function criarLojaTeste() {
+
+  const existe = await Merchant.findOne({
+    slug: "lojateste"
+  });
+
+  if (!existe) {
+
+    await Merchant.create({
+
+      nome: "Loja Teste",
+
+      slug: "lojateste",
+
+      accessToken: "COLE_AQUI_O_ACCESS_TOKEN_DA_LOJA"
+
+    });
+
+    console.log("✅ LOJA TESTE CRIADA");
+  }
+
+}
+
+criarLojaTeste();
 
 
 // 🔥 ROTA INICIAL (FORMULÁRIO)
@@ -157,6 +184,28 @@ atualizar();
   `);
 });
 
+app.get("/:slug", async (req, res) => {
+
+  const slug = req.params.slug;
+
+  const loja = await Merchant.findOne({
+    slug
+  });
+
+  if (!loja) {
+    return res.send("Loja não encontrada");
+  }
+
+  res.send(`
+    <h1>${loja.nome}</h1>
+
+    <form action="/pix/${slug}" method="GET">
+      <input type="text" name="valor" />
+      <button>Gerar PIX</button>
+    </form>
+  `);
+
+});
 
 app.get("/pix", async (req, res) => {
   try {
@@ -437,6 +486,22 @@ const intervalo = setInterval(() => {
 
   return res.send("Erro ao gerar PIX");
 }
+});
+
+app.get("/pix/:slug", async (req, res) => {
+
+  const slug = req.params.slug;
+
+  const loja = await Merchant.findOne({
+    slug
+  });
+
+  if (!loja) {
+    return res.send("Loja não encontrada");
+  }
+
+  console.log("LOJA:", loja.nome);
+
 });
 
 app.get("/webhook", (req, res) => {
