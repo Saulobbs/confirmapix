@@ -506,8 +506,12 @@ app.get("/pix/:slug", async (req, res) => {
   console.log("LOJA:", loja.nome);
 
   const client = new MercadoPagoConfig({
-  accessToken: loja.accessToken
-});
+    accessToken: loja.accessToken
+  });
+
+  console.log("TOKEN DA LOJA:", loja.accessToken);
+
+  return res.send("TOKEN OK");
 
 });
 
