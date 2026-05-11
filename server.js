@@ -1,3 +1,4 @@
+console.log("🚨🚨🚨 ALTERAÇÃO NOVA 999");
 console.log("🔥🔥🔥 SERVER NOVO");
 
 require('dotenv').config()
