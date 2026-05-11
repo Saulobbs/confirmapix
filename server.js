@@ -190,29 +190,6 @@ atualizar();
   `);
 });
 
-app.get("/:slug", async (req, res) => {
-
-  const slug = req.params.slug;
-
-  const loja = await Merchant.findOne({
-    slug
-  });
-
-  if (!loja) {
-    return res.send("Loja não encontrada");
-  }
-
-  res.send(`
-    <h1>${loja.nome}</h1>
-
-    <form action="/pix/${slug}" method="GET">
-      <input type="text" name="valor" />
-      <button>Gerar PIX</button>
-    </form>
-  `);
-
-});
-
 
 
 app.get("/pix/:slug", async (req, res) => {
