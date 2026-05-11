@@ -491,7 +491,7 @@ document.querySelector(".card").appendChild(statusText);
 
 async function verificarStatus() {
   try {
-    const response = await fetch(`/status/${pagamentoId}`);
+    const response = await fetch('/status/' + pagamentoId);
     const data = await response.json();
 
     console.log("STATUS ATUAL:", data.status);
