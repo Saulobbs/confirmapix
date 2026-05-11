@@ -186,7 +186,7 @@ app.get("/pix", async (req, res) => {
     payer: {
       email: "teste@test.com"
     },
-    notification_url: "https://confirmapix.onrender.com/webhook"
+    notification_url: `https://confirmapix.onrender.com/webhook`
   },
   {
     headers: {
@@ -441,7 +441,10 @@ const intervalo = setInterval(() => {
 }
 });
 
-
+app.get("/webhook", (req, res) => {
+  console.log("WEBHOOK GET RECEBIDO");
+  res.send("Webhook ativo");
+});
 app.post("/webhook", async (req, res) => {
 
   console.log("🔥 WEBHOOK RECEBIDO");
