@@ -44,7 +44,7 @@ mongoose.connect(process.env.MONGO_URI)
 
       slug: "lojateste",
 
-      accessToken: "COLE_AQUI_O_ACCESS_TOKEN_DA_LOJA"
+      accessToken: "=APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
 
     });
 
