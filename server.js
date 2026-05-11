@@ -1,6 +1,8 @@
-console.log("🔥 ALTERAÇÃO NOVA 999");
+
 
 require('dotenv').config()
+
+console.log("🚀 SERVIDOR INICIADO");
 process.on('uncaughtException', err => {
   console.error('💥 ERRO CRASH:', err);
 });
@@ -8,15 +10,11 @@ process.on('uncaughtException', err => {
 process.on('unhandledRejection', err => {
   console.error('💥 PROMISE CRASH:', err);
 });
-console.log("🚀 SERVIDOR NOVO RODANDO");
-console.log("🔥 TESTE ALTERAÇÃO");
-console.log("TOKEN:", process.env.ACCESS_TOKEN);
+
 const mongoose = require('mongoose');
 const express = require("express");
-console.log("🔥 SERVIDOR INICIANDO");
 const axios = require("axios");
 const cors = require("cors");
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
