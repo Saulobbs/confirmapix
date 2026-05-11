@@ -445,6 +445,8 @@ app.get("/webhook", (req, res) => {
   console.log("WEBHOOK GET RECEBIDO");
   res.send("Webhook ativo");
 });
+
+console.log("🔥 REGISTRANDO WEBHOOK");
 app.post("/webhook", async (req, res) => {
 
   console.log("🔥 WEBHOOK RECEBIDO");
