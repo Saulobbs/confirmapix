@@ -203,80 +203,156 @@ app.get("/:slug", async (req, res) => {
   }
 
   res.send(`
-  <!DOCTYPE html>
-  <html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-  <head>
-    <meta charset="UTF-8" />
-    <title>${loja.nome}</title>
+<head>
 
-    <style>
-      body{
-        background:#0f172a;
-        font-family:Arial;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
-      }
+<meta charset="UTF-8">
 
-      .box{
-        background:white;
-        padding:30px;
-        border-radius:20px;
-        width:320px;
-        text-align:center;
-      }
+<title>${loja.nome}</title>
 
-      input{
-        width:100%;
-        padding:12px;
-        font-size:20px;
-        border-radius:10px;
-        border:1px solid #ccc;
-        margin-top:15px;
-      }
+<style>
 
-      button{
-        width:100%;
-        padding:12px;
-        margin-top:15px;
-        border:none;
-        border-radius:10px;
-        background:#2ecc71;
-        color:white;
-        font-size:18px;
-        cursor:pointer;
-      }
-    </style>
-  </head>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
-  <body>
+.card{
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  width:350px;
+  text-align:center;
+}
 
-    <div class="box">
+h1{
+  margin-bottom:30px;
+}
 
-      <h1>${loja.nome}</h1>
+input{
+  width:100%;
+  padding:15px;
+  font-size:30px;
+  text-align:center;
+  border-radius:12px;
+  border:2px solid #ddd;
+  outline:none;
+  box-sizing:border-box;
+}
 
-      <form action="/pix/${slug}" method="GET">
+button{
+  width:100%;
+  padding:15px;
+  margin-top:20px;
+  border:none;
+  border-radius:12px;
+  background:#2ecc71;
+  color:white;
+  font-size:20px;
+  cursor:pointer;
+}
 
-        <input
-          type="text"
-          name="valor"
-          placeholder="Digite o valor"
-          required
-        />
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
 
-        <button type="submit">
-          Gerar PIX
-        </button>
+.erro{
+  color:red;
+  margin-top:10px;
+  font-size:14px;
+}
 
-      </form>
+</style>
 
-    </div>
+</head>
 
-  </body>
-  </html>
-  `);
+<body>
+
+<div class="card">
+
+<h1>${loja.nome}</h1>
+
+<form action="/pix/${slug}" method="GET">
+
+<input
+type="text"
+name="valor"
+id="valor"
+value="R$ 0,00"
+required
+/>
+
+<div class="erro" id="erro">
+Valor mínimo: R$ 1,00
+</div>
+
+<button id="btn" type="submit" disabled>
+Gerar PIX
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+const input = document.querySelector('#valor');
+const btn = document.querySelector('#btn');
+const erro = document.querySelector('#erro');
+
+let centavos = 0;
+
+function atualizar(){
+
+  const valor = (centavos / 100).toFixed(2);
+
+  input.value =
+    'R$ ' +
+    valor.replace('.', ',');
+
+  if(centavos >= 100){
+    btn.disabled = false;
+    erro.style.display = 'none';
+  }else{
+    btn.disabled = true;
+    erro.style.display = 'block';
+  }
+
+}
+
+input.addEventListener('keydown', function(e){
+
+  e.preventDefault();
+
+  if(e.key >= '0' && e.key <= '9'){
+    centavos =
+      Number(String(centavos) + e.key);
+  }
+
+  if(e.key === 'Backspace'){
+    centavos =
+      Math.floor(centavos / 10);
+  }
+
+  atualizar();
+
+});
+
+atualizar();
+
+</script>
+
+</body>
+</html>
+`);
 
 });
 
