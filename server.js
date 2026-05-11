@@ -1,5 +1,4 @@
-console.log("🚨🚨🚨 ALTERAÇÃO NOVA 999");
-console.log("🔥🔥🔥 SERVER NOVO");
+console.log("🔥 ALTERAÇÃO NOVA 999");
 
 require('dotenv').config()
 process.on('uncaughtException', err => {
