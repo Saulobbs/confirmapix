@@ -124,7 +124,7 @@ app.get("/", (req, res) => {
     <div class="box">
   <h2>Digite o valor</h2>
 
-  <form action="/pix/${loja.slug}" method="GET">
+  <form action="/lojateste">
     <input type="text" name="valor" value="R$ 0,00" required />
 
     <div class="erro" id="erro">Valor mínimo: R$ 1,00</div>
