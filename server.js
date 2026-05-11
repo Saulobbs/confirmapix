@@ -502,6 +502,10 @@ app.get("/pix/:slug", async (req, res) => {
 
   console.log("LOJA:", loja.nome);
 
+  const client = new MercadoPagoConfig({
+  accessToken: loja.accessToken
+});
+
 });
 
 app.get("/webhook", (req, res) => {
