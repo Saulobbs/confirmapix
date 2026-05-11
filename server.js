@@ -190,7 +190,95 @@ atualizar();
   `);
 });
 
+app.get("/:slug", async (req, res) => {
 
+  const slug = req.params.slug;
+
+  const loja = await Merchant.findOne({
+    slug
+  });
+
+  if (!loja) {
+    return res.send("Loja não encontrada");
+  }
+
+  res.send(`
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>${loja.nome}</title>
+
+    <style>
+      body{
+        background:#0f172a;
+        font-family:Arial;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+      }
+
+      .box{
+        background:white;
+        padding:30px;
+        border-radius:20px;
+        width:320px;
+        text-align:center;
+      }
+
+      input{
+        width:100%;
+        padding:12px;
+        font-size:20px;
+        border-radius:10px;
+        border:1px solid #ccc;
+        margin-top:15px;
+      }
+
+      button{
+        width:100%;
+        padding:12px;
+        margin-top:15px;
+        border:none;
+        border-radius:10px;
+        background:#2ecc71;
+        color:white;
+        font-size:18px;
+        cursor:pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="box">
+
+      <h1>${loja.nome}</h1>
+
+      <form action="/pix/${slug}" method="GET">
+
+        <input
+          type="text"
+          name="valor"
+          placeholder="Digite o valor"
+          required
+        />
+
+        <button type="submit">
+          Gerar PIX
+        </button>
+
+      </form>
+
+    </div>
+
+  </body>
+  </html>
+  `);
+
+});
 
 app.get("/pix/:slug", async (req, res) => {
 
