@@ -48,6 +48,8 @@ mongoose.connect(process.env.MONGO_URI)
 
     });
 
+    console.log("TOKEN DA LOJA:", loja.accessToken);
+
     console.log("✅ LOJA TESTE CRIADA");
   }
 
