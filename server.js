@@ -13,12 +13,12 @@ process.on('unhandledRejection', err => {
 
 const mongoose = require('mongoose');
 const express = require("express");
+app.use(express.urlencoded({ extended: true }));
 const axios = require("axios");
 const { MercadoPagoConfig } = require("mercadopago");
 const cors = require("cors");
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const Pagamento = require("./models/pagamento");
@@ -292,6 +292,52 @@ Criar Loja
 </html>
 
 `);
+
+});
+
+app.post("/criar-loja", async (req, res) => {
+
+  try {
+
+    const { nome, slug, accessToken } = req.body;
+
+    if (!nome || !slug || !accessToken) {
+      return res.send("Preencha todos os campos");
+    }
+
+    const existe = await Merchant.findOne({
+      slug
+    });
+
+    if (existe) {
+      return res.send("Slug já existe");
+    }
+
+    await Merchant.create({
+      nome,
+      slug,
+      accessToken
+    });
+
+    res.send(`
+      <h1>✅ Loja criada com sucesso</h1>
+
+      <p>
+        URL da loja:
+      </p>
+
+      <a href="/${slug}">
+        /${slug}
+      </a>
+    `);
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.send("Erro ao criar loja");
+
+  }
 
 });
 
