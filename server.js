@@ -145,53 +145,47 @@ app.get("/", (req, res) => {
   </form>
 </div>
 <script>
+const input = document.querySelector('input[name="valor"]');
+const btn = document.getElementById('btn');
+const erro = document.getElementById('erro');
 
-const input = document.querySelector("#valor");
-const btn = document.querySelector("#btn");
-const erro = document.querySelector("#erro");
+let centavos = 0;
 
-input.value = "R$ 0,00";
+function atualizar() {
 
-function atualizar(){
+    const valorFormatado = (centavos / 100).toFixed(2);
 
-  let numeros = input.value.replace(/\D/g, "");
+    input.value =
+        "R$ " +
+        valorFormatado.replace(".", ",");
 
-  let valorNumerico = Number(numeros) / 100;
-
-  if(valorNumerico >= 1){
-
-    btn.disabled = false;
-    erro.style.display = "none";
-
-  } else {
-
-    btn.disabled = true;
-    erro.style.display = "block";
-
-  }
-
+    if (centavos >= 100) {
+        btn.disabled = false;
+        erro.style.display = "none";
+    } else {
+        btn.disabled = true;
+        erro.style.display = "block";
+    }
 }
 
-input.addEventListener("input", function(){
+input.addEventListener("keydown", function(e) {
 
-  let numeros = input.value.replace(/\D/g, "");
+    e.preventDefault();
 
-  if(numeros === ""){
-    numeros = "0";
-  }
+    if (e.key >= "0" && e.key <= "9") {
+        centavos =
+            centavos * 10 + Number(e.key);
+    }
 
-  let valor = (Number(numeros) / 100).toFixed(2);
+    if (e.key === "Backspace") {
+        centavos =
+            Math.floor(centavos / 10);
+    }
 
-  valor = valor.replace(".", ",");
-
-  input.value = "R$ " + valor;
-
-  atualizar();
-
+    atualizar();
 });
 
 atualizar();
-
 </script>
   </body>
   </html>
@@ -499,7 +493,6 @@ button:disabled{
 type="text"
 name="valor"
 id="valor"
-value="R$ 0,00"
 inputmode="numeric"
 autocomplete="off"
 required
@@ -518,53 +511,47 @@ Gerar PIX
 </div>
 
 <script>
+const input = document.querySelector('input[name="valor"]');
+const btn = document.getElementById('btn');
+const erro = document.getElementById('erro');
 
-const input = document.querySelector("#valor");
-const btn = document.querySelector("#btn");
-const erro = document.querySelector("#erro");
+let centavos = 0;
 
-input.value = "R$ 0,00";
+function atualizar() {
 
-function atualizar(){
+    const valorFormatado = (centavos / 100).toFixed(2);
 
-  let numeros = input.value.replace(/\D/g, "");
+    input.value =
+        "R$ " +
+        valorFormatado.replace(".", ",");
 
-  let valorNumerico = Number(numeros) / 100;
-
-  if(valorNumerico >= 1){
-
-    btn.disabled = false;
-    erro.style.display = "none";
-
-  } else {
-
-    btn.disabled = true;
-    erro.style.display = "block";
-
-  }
-
+    if (centavos >= 100) {
+        btn.disabled = false;
+        erro.style.display = "none";
+    } else {
+        btn.disabled = true;
+        erro.style.display = "block";
+    }
 }
 
-input.addEventListener("input", function(){
+input.addEventListener("keydown", function(e) {
 
-  let numeros = input.value.replace(/\D/g, "");
+    e.preventDefault();
 
-  if(numeros === ""){
-    numeros = "0";
-  }
+    if (e.key >= "0" && e.key <= "9") {
+        centavos =
+            centavos * 10 + Number(e.key);
+    }
 
-  let valor = (Number(numeros) / 100).toFixed(2);
+    if (e.key === "Backspace") {
+        centavos =
+            Math.floor(centavos / 10);
+    }
 
-  valor = valor.replace(".", ",");
-
-  input.value = "R$ " + valor;
-
-  atualizar();
-
+    atualizar();
 });
 
 atualizar();
-
 </script>
 
 </body>
