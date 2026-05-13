@@ -154,7 +154,7 @@ function formatarMoeda(valor){
 
     valor = valor.replace(/\D/g, '');
 
-    valor = (Number(valor) / 100).toFixed(2) + '';
+    valor = (parseInt(valor || 0) / 100).toFixed(2); 
 
     valor = valor.replace(".", ",");
 
@@ -502,7 +502,7 @@ button:disabled{
 type="text"
 name="valor"
 id="valor"
-value=""
+value="R$ 0,00"
 inputmode="numeric"
 autocomplete="off"
 required
@@ -534,7 +534,7 @@ function formatar(valor){
     valor = "0";
   }
 
-  valor = (parseInt(valor) / 100).toFixed(2);
+  valor = (parseInt(valor || 0) / 100).toFixed(2);
 
   valor = valor.replace(".", ",");
 
