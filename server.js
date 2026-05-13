@@ -144,7 +144,58 @@ app.get("/", (req, res) => {
     <button id="btn" type="submit" disabled>Gerar PIX</button>
   </form>
 </div>
-git push
+<script>
+
+const input = document.querySelector('input[name="valor"]');
+const btn = document.getElementById("btn");
+const erro = document.getElementById("erro");
+
+function formatarMoeda(valor){
+
+    valor = valor.replace(/\D/g, '');
+
+    valor = (Number(valor) / 100).toFixed(2) + '';
+
+    valor = valor.replace(".", ",");
+
+    valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+
+    return 'R$ ' + valor;
+}
+
+function atualizar(){
+
+    let numero = input.value.replace(/\D/g, '');
+
+    numero = Number(numero) / 100;
+
+    if(numero >= 1){
+
+        btn.disabled = false;
+        erro.style.display = "none";
+
+    } else {
+
+        btn.disabled = true;
+        erro.style.display = "block";
+
+    }
+
+}
+
+input.addEventListener("input", function(){
+
+    input.value = formatarMoeda(input.value);
+
+    atualizar();
+
+});
+
+input.value = "R$ 0,00";
+
+atualizar();
+
+</script>
   </body>
   </html>
   `);
