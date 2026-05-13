@@ -524,43 +524,56 @@ Gerar PIX
 
 <script>
 
-const input = document.getElementById("valor");
-const btn = document.getElementById("btn");
-const erro = document.getElementById("erro");
+const input = document.querySelector("#valor");
+const btn = document.querySelector("#btn");
+const erro = document.querySelector("#erro");
 
-input.addEventListener("input", () => {
-
-  let valor = input.value;
+function formatar(valor){
 
   valor = valor.replace(/\D/g, "");
 
-  valor = (Number(valor) / 100).toFixed(2) + "";
+  if(valor === ""){
+    valor = "0";
+  }
+
+  valor = (parseInt(valor) / 100).toFixed(2);
 
   valor = valor.replace(".", ",");
 
-  valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return "R$ " + valor;
+}
 
-  input.value = "R$ " + valor;
+function atualizar(){
 
-  const numero = parseFloat(
-    valor.replace(/\./g, "").replace(",", ".")
-  );
+  let numero = input.value.replace(/\D/g, "");
 
-  if (numero >= 1) {
+  numero = Number(numero) / 100;
+
+  if(numero >= 1){
 
     btn.disabled = false;
     erro.style.display = "none";
 
-  } else {
+  }else{
 
     btn.disabled = true;
     erro.style.display = "block";
 
   }
 
+}
+
+input.addEventListener("input", () => {
+
+  input.value = formatar(input.value);
+
+  atualizar();
+
 });
 
 input.value = "R$ 0,00";
+
+atualizar();
 
 </script>
 
