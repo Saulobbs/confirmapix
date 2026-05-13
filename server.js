@@ -504,7 +504,7 @@ button:disabled{
 type="text"
 name="valor"
 id="valor"
-value="R$ 0,00"
+value=""
 inputmode="numeric"
 autocomplete="off"
 required
@@ -559,6 +559,8 @@ input.addEventListener("input", () => {
   }
 
 });
+
+input.value = "R$ 0,00";
 
 </script>
 
