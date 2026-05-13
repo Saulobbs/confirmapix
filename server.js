@@ -19,6 +19,7 @@ const axios = require("axios");
 const { MercadoPagoConfig } = require("mercadopago");
 const cors = require("cors");
 const session = require("express-session");
+const crypto = require("crypto");
 app.use(express.json());
 app.use(cors());
 app.use(session({
@@ -33,6 +34,57 @@ function verificarLogin(req, res, next) {
   }
 
   return res.redirect("/login");
+}
+
+
+// 🔐 CRIPTOGRAFIA TOKEN
+
+function criptografar(texto) {
+
+  const iv = crypto.randomBytes(16);
+
+  const chave = crypto
+    .createHash("sha256")
+    .update(process.env.TOKEN_SECRET)
+    .digest();
+
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    chave,
+    iv
+  );
+
+  let criptografado =
+    cipher.update(texto, "utf8", "hex");
+
+  criptografado += cipher.final("hex");
+
+  return iv.toString("hex") + ":" + criptografado;
+}
+
+function descriptografar(texto) {
+
+  const partes = texto.split(":");
+
+  const iv = Buffer.from(partes[0], "hex");
+
+  const chave = crypto
+    .createHash("sha256")
+    .update(process.env.TOKEN_SECRET)
+    .digest();
+
+  const decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    chave,
+    iv
+  );
+
+  let descriptografado =
+    decipher.update(partes[1], "hex", "utf8");
+
+  descriptografado += decipher.final("utf8");
+
+  return descriptografado;
 }
 const Pagamento = require("./models/pagamento");
 
@@ -372,7 +424,7 @@ app.post("/criar-loja", async (req, res) => {
     await Merchant.create({
       nome,
       slug,
-      accessToken
+      accessToken: criptografar(accessToken)
     });
 
     res.send(`
@@ -603,7 +655,7 @@ app.get("/pix/:slug", async (req, res) => {
   },
   {
     headers: {
-      Authorization: `Bearer ${loja.accessToken}`,
+      Authorization: `Bearer ${descriptografar(loja.accessToken)}`,
       "X-Idempotency-Key": Date.now().toString()
     }
   }
@@ -624,7 +676,7 @@ if (!pixData) {
     `https://api.mercadopago.com/v1/payments/${response.data.id}`,
     {
       headers: {
-        Authorization: `Bearer ${loja.accessToken}`
+        Authorization: `Bearer ${descriptografar(loja.accessToken)}`
       }
     }
   );
@@ -913,7 +965,7 @@ app.post("/webhook", async (req, res) => {
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
-          Authorization: `Bearer ${loja.accessToken}`,
+         Authorization: `Bearer ${descriptografar(loja.accessToken)}`
         }
       }
     );
