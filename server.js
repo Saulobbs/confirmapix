@@ -505,6 +505,8 @@ type="text"
 name="valor"
 id="valor"
 value="R$ 0,00"
+inputmode="numeric"
+autocomplete="off"
 required
 />
 
@@ -522,49 +524,41 @@ Gerar PIX
 
 <script>
 
-const input = document.querySelector('#valor');
-const btn = document.querySelector('#btn');
-const erro = document.querySelector('#erro');
+const input = document.getElementById("valor");
+const btn = document.getElementById("btn");
+const erro = document.getElementById("erro");
 
-let centavos = 0;
+input.addEventListener("input", () => {
 
-function atualizar(){
+  let valor = input.value;
 
-  const valor = (centavos / 100).toFixed(2);
+  valor = valor.replace(/\D/g, "");
 
-  input.value =
-    'R$ ' +
-    valor.replace('.', ',');
+  valor = (Number(valor) / 100).toFixed(2) + "";
 
-  if(centavos >= 100){
+  valor = valor.replace(".", ",");
+
+  valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  input.value = "R$ " + valor;
+
+  const numero = parseFloat(
+    valor.replace(/\./g, "").replace(",", ".")
+  );
+
+  if (numero >= 1) {
+
     btn.disabled = false;
-    erro.style.display = 'none';
-  }else{
+    erro.style.display = "none";
+
+  } else {
+
     btn.disabled = true;
-    erro.style.display = 'block';
+    erro.style.display = "block";
+
   }
-
-}
-
-input.addEventListener('keydown', function(e){
-
-  e.preventDefault();
-
-  if(e.key >= '0' && e.key <= '9'){
-    centavos =
-      Number(String(centavos) + e.key);
-  }
-
-  if(e.key === 'Backspace'){
-    centavos =
-      Math.floor(centavos / 10);
-  }
-
-  atualizar();
 
 });
-
-atualizar();
 
 </script>
 
