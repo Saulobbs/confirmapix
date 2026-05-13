@@ -150,16 +150,15 @@ const input = document.querySelector("#valor");
 const btn = document.querySelector("#btn");
 const erro = document.querySelector("#erro");
 
-// valor inicial
 input.value = "R$ 0,00";
 
 function atualizar(){
 
-  let numero = input.value.replace(/\D/g, "");
+  let numeros = input.value.replace(/\D/g, "");
 
-  numero = Number(numero) / 100;
+  let valorNumerico = Number(numeros) / 100;
 
-  if(numero >= 1){
+  if(valorNumerico >= 1){
 
     btn.disabled = false;
     erro.style.display = "none";
@@ -173,8 +172,7 @@ function atualizar(){
 
 }
 
-// digitação mobile + pc
-input.addEventListener("keyup", function(){
+input.addEventListener("input", function(){
 
   let numeros = input.value.replace(/\D/g, "");
 
@@ -192,28 +190,6 @@ input.addEventListener("keyup", function(){
 
 });
 
-// proteção extra mobile samsung
-input.addEventListener("focus", function(){
-
-  if(
-    input.value.trim() === "" ||
-    input.value.includes("NaN")
-  ){
-    input.value = "R$ 0,00";
-  }
-
-});
-
-// impede letras
-input.addEventListener("keypress", function(e){
-
-  if(!/[0-9]/.test(e.key)){
-    e.preventDefault();
-  }
-
-});
-
-// atualizar inicial
 atualizar();
 
 </script>
@@ -547,16 +523,15 @@ const input = document.querySelector("#valor");
 const btn = document.querySelector("#btn");
 const erro = document.querySelector("#erro");
 
-// valor inicial
 input.value = "R$ 0,00";
 
 function atualizar(){
 
-  let numero = input.value.replace(/\D/g, "");
+  let numeros = input.value.replace(/\D/g, "");
 
-  numero = Number(numero) / 100;
+  let valorNumerico = Number(numeros) / 100;
 
-  if(numero >= 1){
+  if(valorNumerico >= 1){
 
     btn.disabled = false;
     erro.style.display = "none";
@@ -570,8 +545,7 @@ function atualizar(){
 
 }
 
-// digitação mobile + pc
-input.addEventListener("keyup", function(){
+input.addEventListener("input", function(){
 
   let numeros = input.value.replace(/\D/g, "");
 
@@ -589,28 +563,6 @@ input.addEventListener("keyup", function(){
 
 });
 
-// proteção extra mobile samsung
-input.addEventListener("focus", function(){
-
-  if(
-    input.value.trim() === "" ||
-    input.value.includes("NaN")
-  ){
-    input.value = "R$ 0,00";
-  }
-
-});
-
-// impede letras
-input.addEventListener("keypress", function(e){
-
-  if(!/[0-9]/.test(e.key)){
-    e.preventDefault();
-  }
-
-});
-
-// atualizar inicial
 atualizar();
 
 </script>
