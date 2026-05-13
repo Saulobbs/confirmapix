@@ -144,60 +144,7 @@ app.get("/", (req, res) => {
     <button id="btn" type="submit" disabled>Gerar PIX</button>
   </form>
 </div>
-<script>
-const input = document.querySelector('input[name="valor"]');
-const btn = document.getElementById('btn');
-const erro = document.getElementById('erro');
-
-// valor interno (em centavos)
-let centavos = 0;
-
-input.addEventListener('keydown', function (e) {
-  // permite apagar
-  if (e.key === "Backspace") {
-    centavos = Math.floor(centavos / 10);
-    atualizar();
-    e.preventDefault();
-    return;
-  }
-
-  // só números
-  if (!/[0-9]/.test(e.key)) {
-    e.preventDefault();
-    return;
-  }
-
-  centavos = centavos * 10 + Number(e.key);
-  atualizar();
-
-  e.preventDefault();
-});
-
-function atualizar() {
-  let valor = (centavos / 100).toFixed(2);
-
-  let formatado = valor
-    .replace('.', ',')
-    .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  input.value = 'R$ ' + formatado;
-
-  let numero = Number(valor);
-
-  if (numero >= 1) {
-    btn.disabled = false;
-    btn.classList.add("ativo");
-    erro.style.display = "none";
-  } else {
-    btn.disabled = true;
-    btn.classList.remove("ativo");
-    erro.style.display = "block";
-  }
-}
-
-// valor inicial
-atualizar();
-</script>
+git push
   </body>
   </html>
   `);
