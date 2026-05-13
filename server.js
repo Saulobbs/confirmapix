@@ -146,53 +146,74 @@ app.get("/", (req, res) => {
 </div>
 <script>
 
-const input = document.querySelector('input[name="valor"]');
-const btn = document.getElementById("btn");
-const erro = document.getElementById("erro");
+const input = document.querySelector("#valor");
+const btn = document.querySelector("#btn");
+const erro = document.querySelector("#erro");
 
-function formatarMoeda(valor){
-
-    valor = valor.replace(/\D/g, '');
-
-    valor = (parseInt(valor || 0) / 100).toFixed(2); 
-
-    valor = valor.replace(".", ",");
-
-    valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-
-    return 'R$ ' + valor;
-}
+// valor inicial
+input.value = "R$ 0,00";
 
 function atualizar(){
 
-    let numero = input.value.replace(/\D/g, '');
+  let numero = input.value.replace(/\D/g, "");
 
-    numero = Number(numero) / 100;
+  numero = Number(numero) / 100;
 
-    if(numero >= 1){
+  if(numero >= 1){
 
-        btn.disabled = false;
-        erro.style.display = "none";
+    btn.disabled = false;
+    erro.style.display = "none";
 
-    } else {
+  } else {
 
-        btn.disabled = true;
-        erro.style.display = "block";
+    btn.disabled = true;
+    erro.style.display = "block";
 
-    }
+  }
 
 }
 
-input.addEventListener("input", function(){
+// digitação mobile + pc
+input.addEventListener("keyup", function(){
 
-    input.value = formatarMoeda(input.value);
+  let numeros = input.value.replace(/\D/g, "");
 
-    atualizar();
+  if(numeros === ""){
+    numeros = "0";
+  }
+
+  let valor = (Number(numeros) / 100).toFixed(2);
+
+  valor = valor.replace(".", ",");
+
+  input.value = "R$ " + valor;
+
+  atualizar();
 
 });
 
-input.value = "R$ 0,00";
+// proteção extra mobile samsung
+input.addEventListener("focus", function(){
 
+  if(
+    input.value.trim() === "" ||
+    input.value.includes("NaN")
+  ){
+    input.value = "R$ 0,00";
+  }
+
+});
+
+// impede letras
+input.addEventListener("keypress", function(e){
+
+  if(!/[0-9]/.test(e.key)){
+    e.preventDefault();
+  }
+
+});
+
+// atualizar inicial
 atualizar();
 
 </script>
@@ -526,20 +547,8 @@ const input = document.querySelector("#valor");
 const btn = document.querySelector("#btn");
 const erro = document.querySelector("#erro");
 
-function formatar(valor){
-
-  valor = valor.replace(/\D/g, "");
-
-  if(valor === ""){
-    valor = "0";
-  }
-
-  valor = (parseInt(valor || 0) / 100).toFixed(2);
-
-  valor = valor.replace(".", ",");
-
-  return "R$ " + valor;
-}
+// valor inicial
+input.value = "R$ 0,00";
 
 function atualizar(){
 
@@ -552,7 +561,7 @@ function atualizar(){
     btn.disabled = false;
     erro.style.display = "none";
 
-  }else{
+  } else {
 
     btn.disabled = true;
     erro.style.display = "block";
@@ -561,16 +570,47 @@ function atualizar(){
 
 }
 
-input.addEventListener("input", () => {
+// digitação mobile + pc
+input.addEventListener("keyup", function(){
 
-  input.value = formatar(input.value);
+  let numeros = input.value.replace(/\D/g, "");
+
+  if(numeros === ""){
+    numeros = "0";
+  }
+
+  let valor = (Number(numeros) / 100).toFixed(2);
+
+  valor = valor.replace(".", ",");
+
+  input.value = "R$ " + valor;
 
   atualizar();
 
 });
 
-input.value = "R$ 0,00";
+// proteção extra mobile samsung
+input.addEventListener("focus", function(){
 
+  if(
+    input.value.trim() === "" ||
+    input.value.includes("NaN")
+  ){
+    input.value = "R$ 0,00";
+  }
+
+});
+
+// impede letras
+input.addEventListener("keypress", function(e){
+
+  if(!/[0-9]/.test(e.key)){
+    e.preventDefault();
+  }
+
+});
+
+// atualizar inicial
 atualizar();
 
 </script>
