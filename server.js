@@ -384,9 +384,13 @@ placeholder="slug"
 />
 
 <input
-type="text"
+type="password"
 name="accessToken"
-placeholder="Access Token"
+placeholder="Novo token"
+autocomplete="new-password"
+spellcheck="false"
+autocorrect="off"
+autocapitalize="off"
 />
 
 <button type="submit">
@@ -503,9 +507,13 @@ value="${loja.slug}"
 />
 
 <input
-type="text"
+type="password"
 name="accessToken"
 placeholder="Novo token"
+autocomplete="new-password"
+spellcheck="false"
+autocorrect="off"
+autocapitalize="off"
 />
 
 <button type="submit">
