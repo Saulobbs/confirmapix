@@ -20,6 +20,7 @@ const { MercadoPagoConfig } = require("mercadopago");
 const cors = require("cors");
 const session = require("express-session");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 app.use(express.json());
 app.use(cors());
 app.use(session({
@@ -252,21 +253,26 @@ app.get("/login", (req, res) => {
 
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
 
-  const { usuario, senha } = req.body;
+const { usuario, senha } = req.body;
 
-  if (
+const senhaCorreta = await bcrypt.compare(
+senha,
+process.env.ADMIN_PASS_HASH
+);
+
+if (
 usuario === process.env.ADMIN_USER &&
-senha === process.env.ADMIN_PASS
-){
+senhaCorreta
+) {
 
-    req.session.logado = true;
+req.session.logado = true;
 
-    return res.redirect("/admin");
-  }
+return res.redirect("/admin");
+}
 
-  return res.send("Login inválido");
+return res.send("Login inválido");
 
 });
 
