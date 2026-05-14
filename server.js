@@ -23,6 +23,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 
+
 app.use(express.json());
 app.use(cors());
 const loginLimiter = rateLimit({
@@ -146,16 +147,14 @@ const Merchant = require("./models/merchant");
 const LogModel = require("./models/log");
 
 
+
+
 // 🔥 CONEXÃO MONGO
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("🔥 MongoDB conectado"))
   .catch(err => console.error(err));
 
-  LogModel.create({
-tipo: "TESTE",
-mensagem: "Mongo funcionando",
-ip: "127.0.0.1"
-});
+  
 
 
 // 🔥 ROTA INICIAL (FORMULÁRIO)
