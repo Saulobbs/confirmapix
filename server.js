@@ -407,8 +407,12 @@ app.post("/criar-loja", async (req, res) => {
 
   try {
 
+   console.log("BODY:", req.body);
     const { nome, slug, accessToken } = req.body;
 
+    console.log("NOME:", nome);
+    console.log("SLUG:", slug);
+    console.log("TOKEN:", accessToken);
     if (!nome || !slug || !accessToken) {
       return res.send("Preencha todos os campos");
     }
