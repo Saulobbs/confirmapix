@@ -22,7 +22,7 @@ const session = require("express-session");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
-const ipsBloqueados = {};
+
 app.use(express.json());
 app.use(cors());
 const loginLimiter = rateLimit({
