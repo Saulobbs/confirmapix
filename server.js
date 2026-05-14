@@ -376,14 +376,14 @@ required
 
 <input
 type="text"
-nome="slug"
+name="slug"
 placeholder="slug-da-loja"
 required
 />
 
 <input
 type="text"
-nome="accessToken"
+name="accessToken"
 placeholder="Access Token Mercado Pago"
 required
 />
