@@ -22,6 +22,7 @@ const session = require("express-session");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
+const ipsBloqueados = {};
 app.use(express.json());
 app.use(cors());
 const loginLimiter = rateLimit({
@@ -47,6 +48,44 @@ function verificarLogin(req, res, next) {
   return res.redirect("/login");
 }
 
+
+async function salvarLog(tipo, mensagem, req) {
+
+try {
+
+await Log.create({
+
+tipo,
+
+mensagem,
+
+ip: req.ip
+
+});
+
+} catch (err) {
+
+console.log("Erro log:", err);
+
+}
+
+}
+
+function verificarIP(req, res, next) {
+
+const ip = req.ip;
+
+if (ipsBloqueados[ip]) {
+
+return res.send(
+"IP bloqueado temporariamente."
+);
+
+}
+
+next();
+
+}
 
 // 🔐 CRIPTOGRAFIA TOKEN
 
@@ -100,6 +139,7 @@ function descriptografar(texto) {
 const Pagamento = require("./models/pagamento");
 
 const Merchant = require("./models/merchant");
+const Log = require("./models/log");
 
 // 🔥 CONEXÃO MONGO
 mongoose.connect(process.env.MONGO_URI)
@@ -263,7 +303,11 @@ app.get("/login", (req, res) => {
 
 });
 
-app.post("/login", loginLimiter, async (req, res) => {
+app.post(
+"/login",
+verificarIP,
+loginLimiter,
+async (req, res) => {
 
 const { usuario, senha } = req.body;
 
@@ -277,11 +321,55 @@ usuario === process.env.ADMIN_USER &&
 senhaCorreta
 ) {
 
+  await salvarLog(
+"LOGIN",
+`Login admin realizado`,
+req
+);
+
 req.session.logado = true;
 
 return res.redirect("/admin");
 }
 
+
+await salvarLog(
+"LOGIN_ERRO",
+`Tentativa login inválido`,
+req
+);
+
+const ip = req.ip;
+
+if (!ipsBloqueados[ip]) {
+
+ipsBloqueados[ip] = 1;
+
+} else {
+
+ipsBloqueados[ip]++;
+
+}
+
+if (ipsBloqueados[ip] >= 5) {
+
+await salvarLog(
+"IP_BLOQUEADO",
+`IP bloqueado: ${ip}`,
+req
+);
+
+setTimeout(() => {
+
+delete ipsBloqueados[ip];
+
+}, 15 * 60 * 1000);
+
+return res.send(
+"IP bloqueado por 15 minutos."
+);
+
+}
 return res.send("Login inválido");
 
 });
@@ -296,7 +384,7 @@ res.redirect("/login");
 
 });
 
-app.get("/admin", verificarLogin, async (req, res) => {
+app.get("/admin", verificarIP, verificarLogin, async (req, res) => {
 
 const lojas = await Merchant.find();
 
@@ -422,7 +510,7 @@ ${htmlLojas}
 
 });
 
-app.post("/criar-loja", async (req, res) => {
+app.post("/criar-loja", verificarIP, async (req, res) => {
 
   try {
 
@@ -449,6 +537,12 @@ app.post("/criar-loja", async (req, res) => {
       slug,
       accessToken: criptografar(accessToken)
     });
+
+    await salvarLog(
+"CRIAR_LOJA",
+`Loja ${nome} criada`,
+req
+);
 
     res.send(`
       <h1>✅ Loja criada com sucesso</h1>
@@ -536,7 +630,7 @@ Salvar
 
 });
 
-app.post("/editar-loja/:id", verificarLogin, async (req, res) => {
+app.post("/editar-loja/:id", verificarIP, verificarLogin, async (req, res) => {
 
 const {
 nome,
@@ -559,7 +653,14 @@ req.params.id,
 dados
 );
 
+await salvarLog(
+"EDITAR_LOJA",
+`Loja alterada: ${nome}`,
+req
+);
 res.redirect("/admin");
+
+
 
 });
 
