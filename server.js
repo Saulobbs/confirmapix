@@ -95,35 +95,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("🔥 MongoDB conectado"))
   .catch(err => console.error(err));
 
-  async function criarLojaTeste() {
-
-  const existe = await Merchant.findOne({
-    slug: "lojateste"
-  });
-
-  if (true) {
-
-    await Merchant.findOneAndUpdate(
-      { slug: "lojateste" },
-
-      {
-        nome: "Loja Teste",
-        slug: "lojateste",
-        accessToken: criptografar("APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592")
-      },
-
-      { upsert: true }
-    );
-
-    console.log("LOJA TESTE ATUALIZADA");
-  }
-
-}
-
   
-  
-
-criarLojaTeste();
 
 
 // 🔥 ROTA INICIAL (FORMULÁRIO)
@@ -285,9 +257,9 @@ app.post("/login", (req, res) => {
   const { usuario, senha } = req.body;
 
   if (
-    usuario === "admin" &&
-    senha === "@Sa241985confirmapix2026"
-  ) {
+usuario === process.env.ADMIN_USER &&
+senha === process.env.ADMIN_PASS
+){
 
     req.session.logado = true;
 
@@ -298,7 +270,50 @@ app.post("/login", (req, res) => {
 
 });
 
-app.get("/admin", verificarLogin, (req, res) => {
+app.get("/admin", verificarLogin, async (req, res) => {
+
+const lojas = await Merchant.find();
+
+let htmlLojas = "";
+
+lojas.forEach(loja => {
+
+htmlLojas += `
+<div style="
+padding:15px;
+border:1px solid #ddd;
+border-radius:10px;
+margin-top:10px;
+">
+
+<h3>${loja.nome}</h3>
+
+<p>
+Slug: ${loja.slug}
+</p>
+
+<a href="/editar-loja/${loja._id}">
+<button style="
+background:#3498db;
+margin-top:10px;
+">
+Editar
+</button>
+</a>
+
+<a href="/apagar-loja/${loja._id}">
+<button style="
+background:#e74c3c;
+margin-top:10px;
+">
+Apagar
+</button>
+</a>
+
+</div>
+`;
+
+});
 
 res.send(`
 
@@ -306,62 +321,16 @@ res.send(`
 <html lang="pt-BR">
 
 <head>
-
 <meta charset="UTF-8">
-
 <title>Painel Admin</title>
-
-<style>
-
-body{
-  margin:0;
-  background:#0f172a;
-  font-family:Arial;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-.card{
-  background:white;
-  padding:40px;
-  border-radius:20px;
-  width:400px;
-}
-
-h1{
-  text-align:center;
-  margin-bottom:30px;
-}
-
-input{
-  width:100%;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:10px;
-  background:#2ecc71;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-}
-
-</style>
-
 </head>
 
-<body>
-
-<div class="card">
+<body style="
+font-family:Arial;
+padding:30px;
+background:#0f172a;
+color:white;
+">
 
 <h1>Criar Loja</h1>
 
@@ -370,22 +339,19 @@ button{
 <input
 type="text"
 name="nome"
-placeholder="Nome da loja"
-required
+placeholder="Nome"
 />
 
 <input
 type="text"
 name="slug"
-placeholder="slug-da-loja"
-required
+placeholder="slug"
 />
 
 <input
 type="text"
 name="accessToken"
-placeholder="Access Token Mercado Pago"
-required
+placeholder="Access Token"
 />
 
 <button type="submit">
@@ -394,7 +360,11 @@ Criar Loja
 
 </form>
 
-</div>
+<hr>
+
+<h1>Lojas cadastradas</h1>
+
+${htmlLojas}
 
 </body>
 </html>
@@ -450,6 +420,93 @@ app.post("/criar-loja", async (req, res) => {
     res.send("Erro ao criar loja");
 
   }
+
+});
+
+app.get("/apagar-loja/:id", verificarLogin, async (req, res) => {
+
+try {
+
+await Merchant.findByIdAndDelete(
+req.params.id
+);
+
+res.redirect("/admin");
+
+} catch {
+
+res.send("Erro ao apagar loja");
+
+}
+
+});
+
+app.get("/editar-loja/:id", verificarLogin, async (req, res) => {
+
+const loja = await Merchant.findById(
+req.params.id
+);
+
+if (!loja) {
+return res.send("Loja não encontrada");
+}
+
+res.send(`
+
+<form method="POST">
+
+<input
+type="text"
+name="nome"
+value="${loja.nome}"
+/>
+
+<input
+type="text"
+name="slug"
+value="${loja.slug}"
+/>
+
+<input
+type="text"
+name="accessToken"
+placeholder="Novo token"
+/>
+
+<button type="submit">
+Salvar
+</button>
+
+</form>
+
+`);
+
+});
+
+app.post("/editar-loja/:id", verificarLogin, async (req, res) => {
+
+const {
+nome,
+slug,
+accessToken
+} = req.body;
+
+const dados = {
+nome,
+slug
+};
+
+if (accessToken) {
+dados.accessToken =
+criptografar(accessToken);
+}
+
+await Merchant.findByIdAndUpdate(
+req.params.id,
+dados
+);
+
+res.redirect("/admin");
 
 });
 
