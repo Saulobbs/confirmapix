@@ -66,6 +66,7 @@ ip: req.ip
 } catch (err) {
 
 console.log("Erro log:", err);
+console.error(err);
 
 }
 
