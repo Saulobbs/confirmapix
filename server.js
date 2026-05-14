@@ -21,8 +21,18 @@ const cors = require("cors");
 const session = require("express-session");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit");
 app.use(express.json());
 app.use(cors());
+const loginLimiter = rateLimit({
+
+windowMs: 15 * 60 * 1000,
+
+max: 5,
+
+message: "Muitas tentativas. Tente novamente em 15 minutos."
+
+});
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -253,7 +263,7 @@ app.get("/login", (req, res) => {
 
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
 
 const { usuario, senha } = req.body;
 
