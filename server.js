@@ -270,6 +270,16 @@ senha === process.env.ADMIN_PASS
 
 });
 
+app.get("/logout", (req, res) => {
+
+req.session.destroy(() => {
+
+res.redirect("/login");
+
+});
+
+});
+
 app.get("/admin", verificarLogin, async (req, res) => {
 
 const lojas = await Merchant.find();
@@ -331,6 +341,25 @@ padding:30px;
 background:#0f172a;
 color:white;
 ">
+
+<div style="text-align:right; margin-bottom:20px;">
+
+<a href="/logout">
+
+<button style="
+background:#e74c3c;
+padding:10px;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+">
+Sair
+</button>
+
+</a>
+
+</div>
 
 <h1>Criar Loja</h1>
 
