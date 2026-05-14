@@ -144,6 +144,11 @@ const Pagamento = require("./models/pagamento");
 
 const Merchant = require("./models/merchant");
 const Log = require("./models/log");
+Log.create({
+tipo: "TESTE",
+mensagem: "Teste manual",
+ip: "127.0.0.1"
+});
 
 // 🔥 CONEXÃO MONGO
 mongoose.connect(process.env.MONGO_URI)
@@ -513,7 +518,11 @@ ${htmlLojas}
 
 });
 
-app.post("/criar-loja", verificarIP, async (req, res) => {
+app.post(
+"/criar-loja",
+verificarIP,
+verificarLogin,
+async (req, res) => {
 
   try {
 
