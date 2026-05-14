@@ -71,6 +71,9 @@ console.log("Erro log:", err);
 
 }
 
+const ipsBloqueados = {};
+const tentativasLogin = {};
+
 function verificarIP(req, res, next) {
 
 const ip = req.ip;
@@ -341,17 +344,15 @@ req
 
 const ip = req.ip;
 
-if (!ipsBloqueados[ip]) {
-
-ipsBloqueados[ip] = 1;
-
+if (!tentativasLogin[ip]) {
+tentativasLogin[ip] = 1;
 } else {
-
-ipsBloqueados[ip]++;
-
+tentativasLogin[ip]++;
 }
 
-if (ipsBloqueados[ip] >= 5) {
+if (tentativasLogin[ip] >= 5) {
+
+ipsBloqueados[ip] = true;
 
 await salvarLog(
 "IP_BLOQUEADO",
@@ -362,6 +363,7 @@ req
 setTimeout(() => {
 
 delete ipsBloqueados[ip];
+delete tentativasLogin[ip];
 
 }, 15 * 60 * 1000);
 
