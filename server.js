@@ -53,7 +53,7 @@ async function salvarLog(tipo, mensagem, req) {
 
 try {
 
-await Log.create({
+await LogModel.create({
 
 tipo,
 
@@ -143,7 +143,7 @@ function descriptografar(texto) {
 const Pagamento = require("./models/pagamento");
 
 const Merchant = require("./models/merchant");
-const Log = require("./models/log");
+const LogModel = require("./models/log");
 
 
 // 🔥 CONEXÃO MONGO
@@ -151,7 +151,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("🔥 MongoDB conectado"))
   .catch(err => console.error(err));
 
-  Log.create({
+  LogModel.create({
 tipo: "TESTE",
 mensagem: "Mongo funcionando",
 ip: "127.0.0.1"
