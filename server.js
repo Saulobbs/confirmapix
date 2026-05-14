@@ -109,7 +109,7 @@ mongoose.connect(process.env.MONGO_URI)
       {
         nome: "Loja Teste",
         slug: "lojateste",
-        accessToken: "APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592"
+        accessToken: criptografar("APP_USR-3962465380015954-051023-5424fd70d58ac4accb962f632e738121-139582592")
       },
 
       { upsert: true }
@@ -376,14 +376,14 @@ required
 
 <input
 type="text"
-name="slug"
+nome="slug"
 placeholder="slug-da-loja"
 required
 />
 
 <input
 type="text"
-name="accessToken"
+nome="accessToken"
 placeholder="Access Token Mercado Pago"
 required
 />
