@@ -931,7 +931,8 @@ const base64 = pixData.qr_code_base64;
       pix: copia,
       pagamentoId: response.data.id,
       email: "teste@test.com",
-      slug: loja.slug
+      slug: loja.slug,
+      merchantId: loja._id
     });
 
     console.log("✅ SALVO COM SUCESSO");
