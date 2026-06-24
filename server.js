@@ -11,6 +11,13 @@ process.on('unhandledRejection', err => {
   console.error('💥 PROMISE CRASH:', err);
 });
 
+const dns = require("dns");
+
+dns.setServers([
+  "8.8.8.8",
+  "8.8.4.4"
+]);
+
 const mongoose = require('mongoose');
 const express = require("express");
 const app = express();
@@ -22,10 +29,21 @@ const session = require("express-session");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
+const authRoutes = require("./routes/auth");
+const dashboardRoutes = require("./routes/dashboard");
+const assinaturaRoutes = require("./routes/assinatura");
 
 
 app.use(express.json());
 app.use(cors());
+
+app.use("/auth", authRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/assinatura", assinaturaRoutes);
+app.get("/teste", (req, res) => {
+  res.send("TESTE OK");
+});
+
 const loginLimiter = rateLimit({
 
 windowMs: 15 * 60 * 1000,
@@ -150,10 +168,14 @@ const LogModel = require("./models/log");
 
 
 // 🔥 CONEXÃO MONGO
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("🔥 MongoDB conectado"))
-  .catch(err => console.error(err));
 
+console.log("MONGO_URI:");
+console.log(process.env.MONGO_URI);
+
+mongoose.connect(process.env.MONGO_URI)
+
+.then(() => console.log("🔥 MongoDB conectado"))
+.catch(err => console.error(err));
   
 
 
