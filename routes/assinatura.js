@@ -82,6 +82,10 @@ router.get("/webhook", (req, res) => {
 
 router.post("/webhook", async (req, res) => {
 
+    console.log("🔥 WEBHOOK ASSINATURA RECEBIDO");
+console.log("BODY:", req.body);
+console.log("QUERY:", req.query);
+
   try {
 
     const pagamentoId =
