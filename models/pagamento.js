@@ -8,6 +8,16 @@ const PagamentoSchema = new mongoose.Schema({
   email: String,
   slug: String,
 
+  merchantId: {
+type: mongoose.Schema.Types.ObjectId,
+ref: "Merchant"
+},
+
+userId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+},
+
   criadoEm: {
     type: Date,
     default: Date.now

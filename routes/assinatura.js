@@ -154,5 +154,28 @@ console.log("QUERY:", req.query);
   }
 
 });
+console.log("ROTA ASSINATURA CARREGADA");
+router.get("/status/:pagamentoId", async (req, res) => {
+
+  const assinatura =
+    await Assinatura.findOne({
+      pagamentoId: Number(
+        req.params.pagamentoId
+      )
+    });
+
+  if (!assinatura) {
+
+    return res.json({
+      status: "pendente"
+    });
+
+  }
+
+  return res.json({
+    status: assinatura.status
+  });
+
+});
 
 module.exports = router;

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -9,51 +10,104 @@ export default function Login() {
   const [erro, setErro] = useState("");
 
   const handleLogin = async (e) => {
+
     e.preventDefault();
 
+    setErro("");
+
     try {
+
       const response = await fetch(
         "http://localhost:3000/auth/login",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify({
-            email,
+            email: email.trim(),
             senha,
           }),
+
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setErro(data.erro || "Erro ao fazer login");
+
+        setErro(
+          data.erro ||
+          "Erro ao fazer login"
+        );
+
         return;
       }
 
+      // ============================================================
       // SALVA TOKEN
-      localStorage.setItem("token", data.token);
+      // ============================================================
 
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+
+      // ============================================================
       // SALVA USUÁRIO
+      // ============================================================
+
       localStorage.setItem(
         "usuario",
         JSON.stringify(data.usuario)
       );
 
+
+      // ============================================================
+      // ADMIN
+      // ============================================================
+
+      if (
+        data.usuario?.role === "admin"
+      ) {
+
+        navigate("/admin");
+
+        return;
+      }
+
+
+      // ============================================================
+      // CLIENTE NORMAL
+      // ============================================================
+
       navigate("/dashboard");
+
     } catch (error) {
-      setErro("Erro de conexão");
+
+      console.error(error);
+
+      setErro(
+        "Erro de conexão com o servidor"
+      );
+
     }
+
   };
 
+
   return (
+
     <div className="min-h-screen flex items-center justify-center bg-[#0B1020]">
+
       <form
         onSubmit={handleLogin}
         className="w-full max-w-md p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur"
       >
+
         <h1 className="text-4xl font-bold text-white mb-2">
           Entrar
         </h1>
@@ -62,27 +116,37 @@ export default function Login() {
           Acesse sua conta ConfirmaPix
         </p>
 
+
         <input
-          type="email"
-          placeholder="Seu e-mail"
+          type="text"
+          placeholder="E-mail ou usuário"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           className="w-full mb-4 p-3 rounded-xl bg-white/10 text-white"
         />
+
 
         <input
           type="password"
           placeholder="Sua senha"
           value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          onChange={(e) =>
+            setSenha(e.target.value)
+          }
           className="w-full mb-4 p-3 rounded-xl bg-white/10 text-white"
         />
 
+
         {erro && (
+
           <p className="text-red-500 mb-4">
             {erro}
           </p>
+
         )}
+
 
         <button
           type="submit"
@@ -90,7 +154,11 @@ export default function Login() {
         >
           Entrar
         </button>
+
       </form>
+
     </div>
+
   );
+
 }

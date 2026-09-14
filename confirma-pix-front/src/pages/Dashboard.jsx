@@ -4,11 +4,16 @@ import { useNavigate } from "react-router-dom";
 export default function Dashboard() {
 
   const navigate = useNavigate();
-const [mostrarApi, setMostrarApi] = useState(false);
+
+  const [mostrarApi, setMostrarApi] = useState(false);
   const [usuario, setUsuario] = useState(null);
+
   const [apiKey, setApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
-  const [filtroStatus, setFiltroStatus] = useState("todos");   
+  const [nomeLoja, setNomeLoja] = useState("");
+  const [slugLoja, setSlugLoja] = useState("");
+
+  const [filtroStatus, setFiltroStatus] = useState("todos");
 
   const [stats, setStats] = useState({
     pagamentosHoje: 0,
@@ -18,6 +23,18 @@ const [mostrarApi, setMostrarApi] = useState(false);
     registrosTotais: 0,
     ultimasTransacoes: []
   });
+
+  // TRANSFORMA O NOME DA LOJA EM SLUG
+  function gerarSlug(nome) {
+
+    return nome
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9]/g, "");
+
+  }
 
   useEffect(() => {
 
@@ -32,69 +49,103 @@ const [mostrarApi, setMostrarApi] = useState(false);
       localStorage.getItem("usuario");
 
     if (dadosUsuario) {
-      setUsuario(JSON.parse(dadosUsuario));
+
+      const dados = JSON.parse(dadosUsuario);
+
+      setUsuario(dados);
+
+      setApiKey(dados.apiKey || "");
+      setWebhookUrl(dados.webhookUrl || "");
+      setNomeLoja(dados.nomeLoja || "");
+      setSlugLoja(
+        dados.slugLoja ||
+        gerarSlug(dados.nomeLoja || "")
+      );
+
     }
 
     carregarStats();
 
   }, []);
 
-async function salvarConfiguracao() {
-
-  try {
-
-    const response = await fetch(
-      "http://localhost:3000/auth/config",
-      {
-        method: "PUT",
-        headers: {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`
-},
-       body: JSON.stringify({
-        apiKey,
-        webhookUrl
-     })
-      }
-    );
-
-    const data = await response.json();
-
-    console.log("CONFIG SALVA:", data);
-    //alert(JSON.stringify(data));
-
-
-    if (data.usuario) {
-
-      localStorage.setItem(
-        "usuario",
-        JSON.stringify(data.usuario)
-      );
-
-      setUsuario(data.usuario);
-
-      alert("Configuração salva!");
-
-    }
-
-  } catch (err) {
-
-    console.error(err);
-
-    alert("Erro ao salvar");
-
-  }
-
-}
-
-  async function carregarStats() {
-    
+  async function salvarConfiguracao() {
 
     try {
 
-      console.log("USUARIO ATUAL:", usuario);
       const response = await fetch(
-        "http://127.0.0.1:3000/dashboard/stats"
+        "http://localhost:3000/auth/config",
+        {
+          method: "PUT",
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              `Bearer ${localStorage.getItem("token")}`
+          },
+
+          body: JSON.stringify({
+
+            apiKey,
+            webhookUrl,
+            nomeLoja,
+            slugLoja
+
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("CONFIG SALVA:", data);
+
+      if (!response.ok) {
+
+        alert(data.erro || "Erro ao salvar configuração");
+        return;
+
+      }
+
+      if (data.usuario) {
+
+        localStorage.setItem(
+          "usuario",
+          JSON.stringify(data.usuario)
+        );
+
+        setUsuario(data.usuario);
+
+        setApiKey(data.usuario.apiKey || "");
+        setWebhookUrl(data.usuario.webhookUrl || "");
+        setNomeLoja(data.usuario.nomeLoja || "");
+        setSlugLoja(data.usuario.slugLoja || "");
+
+        alert("Configuração salva!");
+
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert("Erro ao salvar");
+
+    }
+
+  }
+
+  async function carregarStats() {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://127.0.0.1:3000/dashboard/stats",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
 
       const data = await response.json();
@@ -113,59 +164,54 @@ async function salvarConfiguracao() {
 
   async function assinarPro() {
 
-  try {
+    try {
 
-    const response = await fetch(
-      "http://localhost:3000/assinatura/pix",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId: usuario.id
-        })
+      const response = await fetch(
+        "http://localhost:3000/assinatura/pix",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            userId: usuario.id
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("RESPOSTA:", data);
+
+      if (!data.sucesso) {
+
+        alert("Erro ao gerar PIX");
+        return;
+
       }
-    );
 
-    const data = await response.json();
+      localStorage.setItem(
+        "assinaturaPix",
+        JSON.stringify(data)
+      );
 
-    console.log("RESPOSTA:", data);
+      window.location.href = "/assinatura";
 
-alert(JSON.stringify(data));
+    } catch (err) {
 
-    console.log(data);
+      console.error(err);
 
-    if (!data.sucesso) {
+      alert("Erro ao gerar assinatura");
 
-      alert("Erro ao gerar PIX");
-
-      return;
     }
 
-    localStorage.setItem(
-      "assinaturaPix",
-      JSON.stringify(data)
-    );
-
-    window.location.href = "/assinatura";
-
-
-  } catch (err) {
-
-    console.error(err);
-
-    alert("Erro ao gerar assinatura");
-
   }
-
-}
-  
 
   function sair() {
 
     localStorage.removeItem("token");
-
     localStorage.removeItem("usuario");
 
     navigate("/login");
@@ -331,42 +377,44 @@ alert(JSON.stringify(data));
 
         </div>
 
+        {/* ASSINATURA */}
+
         <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6 mb-10">
 
-  <h2 className="text-2xl font-bold mb-4">
-    Assinatura
-  </h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Assinatura
+          </h2>
 
-  <p className="text-gray-400">
-    Plano atual
-  </p>
+          <p className="text-gray-400">
+            Plano atual
+          </p>
 
-  <h3 className="text-3xl font-bold mt-2">
-    {usuario.plano === "pro"
-      ? "PRO"
-      : "TESTE"}
-  </h3>
+          <h3 className="text-3xl font-bold mt-2">
+            {usuario.plano === "pro"
+              ? "PRO"
+              : "TESTE"}
+          </h3>
 
-  <p className="mt-4 text-gray-400">
-    Valor mensal
-  </p>
+          <p className="mt-4 text-gray-400">
+            Valor mensal
+          </p>
 
-  <h3 className="text-2xl font-bold text-green-400">
-    R$ 19,90
-  </h3>
+          <h3 className="text-2xl font-bold text-green-400">
+            R$ 19,90
+          </h3>
 
-  {usuario.plano !== "pro" && (
+          {usuario.plano !== "pro" && (
 
-   <button
-  className="mt-6 bg-green-600 px-6 py-3 rounded-xl font-bold"
-  onClick={assinarPro}
->
-  Assinar PRO
-</button>
+            <button
+              className="mt-6 bg-green-600 px-6 py-3 rounded-xl font-bold"
+              onClick={assinarPro}
+            >
+              Assinar PRO
+            </button>
 
-  )}
+          )}
 
-</div>
+        </div>
 
         {/* ÚLTIMAS TRANSAÇÕES */}
 
@@ -378,40 +426,40 @@ alert(JSON.stringify(data));
 
           <div className="flex gap-3 mb-6">
 
-  <button
-    onClick={() => setFiltroStatus("todos")}
-    className={`px-4 py-2 rounded-xl ${
-      filtroStatus === "todos"
-        ? "bg-blue-600"
-        : "bg-gray-700"
-    }`}
-  >
-    Todos
-  </button>
+            <button
+              onClick={() => setFiltroStatus("todos")}
+              className={`px-4 py-2 rounded-xl ${
+                filtroStatus === "todos"
+                  ? "bg-blue-600"
+                  : "bg-gray-700"
+              }`}
+            >
+              Todos
+            </button>
 
-  <button
-    onClick={() => setFiltroStatus("aprovado")}
-    className={`px-4 py-2 rounded-xl ${
-      filtroStatus === "aprovado"
-        ? "bg-green-600"
-        : "bg-gray-700"
-    }`}
-  >
-    Aprovados
-  </button>
+            <button
+              onClick={() => setFiltroStatus("aprovado")}
+              className={`px-4 py-2 rounded-xl ${
+                filtroStatus === "aprovado"
+                  ? "bg-green-600"
+                  : "bg-gray-700"
+              }`}
+            >
+              Aprovados
+            </button>
 
-  <button
-    onClick={() => setFiltroStatus("pendente")}
-    className={`px-4 py-2 rounded-xl ${
-      filtroStatus === "pendente"
-        ? "bg-yellow-600"
-        : "bg-gray-700"
-    }`}
-  >
-    Pendentes
-  </button>
+            <button
+              onClick={() => setFiltroStatus("pendente")}
+              className={`px-4 py-2 rounded-xl ${
+                filtroStatus === "pendente"
+                  ? "bg-yellow-600"
+                  : "bg-gray-700"
+              }`}
+            >
+              Pendentes
+            </button>
 
-</div>
+          </div>
 
           <div className="overflow-x-auto">
 
@@ -444,52 +492,52 @@ alert(JSON.stringify(data));
               <tbody>
 
                 {stats.ultimasTransacoes
-  ?.filter((item) => {
+                  ?.filter((item) => {
 
-    if (filtroStatus === "todos")
-      return true;
+                    if (filtroStatus === "todos")
+                      return true;
 
-    return item.status === filtroStatus;
+                    return item.status === filtroStatus;
 
-  })
-  .map((item) => (
+                  })
+                  .map((item) => (
 
-                  <tr
-                    key={item._id}
-                    className="border-b border-white/5"
-                  >
+                    <tr
+                      key={item._id}
+                      className="border-b border-white/5"
+                    >
 
-                    <td className="py-4">
-                      R$ {Number(item.valor || 0).toFixed(2)}
-                    </td>
+                      <td className="py-4">
+                        R$ {Number(item.valor || 0).toFixed(2)}
+                      </td>
 
-                    <td className="py-4">
+                      <td className="py-4">
 
-                      <span
-                        className={
-                          item.status === "aprovado"
-                            ? "text-green-400"
-                            : "text-yellow-400"
-                        }
-                      >
-                        {item.status}
-                      </span>
+                        <span
+                          className={
+                            item.status === "aprovado"
+                              ? "text-green-400"
+                              : "text-yellow-400"
+                          }
+                        >
+                          {item.status}
+                        </span>
 
-                    </td>
+                      </td>
 
-                    <td className="py-4">
-                      {item.email}
-                    </td>
+                      <td className="py-4">
+                        {item.email}
+                      </td>
 
-                    <td className="py-4">
-                      {new Date(
-                        item.criadoEm
-                      ).toLocaleString("pt-BR")}
-                    </td>
+                      <td className="py-4">
+                        {new Date(
+                          item.criadoEm
+                        ).toLocaleString("pt-BR")}
+                      </td>
 
-                  </tr>
+                    </tr>
 
-                ))}
+                  ))}
 
               </tbody>
 
@@ -497,143 +545,241 @@ alert(JSON.stringify(data));
 
             <div className="grid md:grid-cols-3 gap-6 mt-8">
 
-  <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
+              {/* TAXA DE CONVERSÃO */}
 
-    <h3 className="font-bold text-lg mb-3">
-      Taxa de Conversão
-    </h3>
+              <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
 
-    <p>PIX Gerados: {stats.registrosTotais}</p>
+                <h3 className="font-bold text-lg mb-3">
+                  Taxa de Conversão
+                </h3>
 
-    <p>PIX Pagos: {stats.pixConfirmados}</p>
+                <p>
+                  PIX Gerados: {stats.registrosTotais}
+                </p>
 
-    <p className="text-green-400 font-bold mt-2">
-      Conversão:
-      {" "}
-      {stats.registrosTotais
-        ? (
-            (stats.pixConfirmados /
-              stats.registrosTotais) *
-            100
-          ).toFixed(2)
-        : 0}
-      %
-    </p>
+                <p>
+                  PIX Pagos: {stats.pixConfirmados}
+                </p>
 
-  </div>
+                <p className="text-green-400 font-bold mt-2">
 
-  <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
+                  Conversão{" "}
 
-    <h3 className="font-bold text-lg mb-3">
-      Status da Integração
-    </h3>
+                  {stats.registrosTotais
+                    ? (
+                        (stats.pixConfirmados /
+                          stats.registrosTotais) *
+                        100
+                      ).toFixed(2)
+                    : 0}
 
-    <p className="text-green-400 font-bold">
-      🟢 Mercado Pago Conectado
-    </p>
+                  %
 
-  </div>
+                </p>
 
-  <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
+              </div>
 
-<div className="bg-[#050816] border border-white/10 rounded-2xl p-5 mb-6">
+              {/* STATUS DA INTEGRAÇÃO */}
 
-  <h3 className="font-bold text-lg mb-4">
-    Configuração Mercado Pago
-  </h3>
+              <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
 
- <div className="flex gap-2">
-  <input
-    type={mostrarApi ? "text" : "password"}
-    value={apiKey}
-    onChange={(e) => setApiKey(e.target.value)}
-    className="flex-1"
-  />
+                <h3 className="font-bold text-lg mb-3">
+                  Status da Integração
+                </h3>
 
+                <div className="flex items-center gap-2 mt-5">
 
-</div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
 
-  <input
-    type="text"
-    placeholder="Webhook URL"
-    value={webhookUrl}
-    onChange={(e) => setWebhookUrl(e.target.value)}
-    className="w-full p-3 rounded-xl bg-[#0d111d] mb-4"
-  />
+                  <span className="text-green-400 font-bold">
+                    Mercado Pago Conectado
+                  </span>
 
-  <button
-    onClick={salvarConfiguracao}
-    className="bg-green-600 px-5 py-3 rounded-xl font-bold"
-  >
-    Salvar Configuração
-  </button>
+                </div>
 
-</div>
+              </div>
 
-    <h3 className="font-bold text-lg mb-3">
-      API Key
-    </h3>
+              {/* CONFIGURAÇÃO MERCADO PAGO */}
 
-    <div className="flex justify-between items-center">
+              <div className="bg-[#050816] border border-white/10 rounded-2xl p-5">
 
-     <p>
-  {mostrarApi
-    ? usuario?.apiKey
-    : "••••••••••••••••"}
-</p>
+                <h3 className="font-bold text-lg mb-4">
+                  Configuração Mercado Pago
+                </h3>
 
-<button
-  className="bg-blue-600 px-3 py-1 rounded-lg"
-  onClick={() =>
-    navigator.clipboard.writeText(
-      usuario?.apiKey || ""
-    )
-  }
->
-  Copiar
-</button>
+                <label className="block text-sm font-bold mb-1">
+                  Nome da Loja
+                </label>
 
-<button
-  className="bg-gray-600 px-3 py-1 rounded-lg ml-2"
-  onClick={() =>
-    setMostrarApi(!mostrarApi)
-  }
->
-  {mostrarApi ? "Ocultar" : "Mostrar"}
-</button>
+                <input
+                  type="text"
+                  value={nomeLoja}
+                  onChange={(e) => {
 
-    </div>
+                    const nome = e.target.value;
 
-  </div>
+                    setNomeLoja(nome);
 
-</div>
+                    // ATUALIZA O SLUG NA HORA
+                    setSlugLoja(gerarSlug(nome));
 
-<div className="bg-[#050816] border border-white/10 rounded-2xl p-5 mt-6">
+                  }}
+                  className="w-full p-2 rounded-lg bg-[#0d111d] mb-3"
+                  placeholder="Nome da loja"
+                />
 
-  <h3 className="font-bold text-lg mb-3">
-    Webhook URL
-  </h3>
+                <label className="block text-sm font-bold mb-1">
+                  Sua Página PIX
+                </label>
 
-  <div className="flex justify-between items-center">
+                <div className="bg-[#0d111d] rounded-lg p-2 text-xs break-all mb-2">
 
-    <span>
-  {usuario.webhookUrl || "Não configurada"}
-</span>
+                  https://confirmapix.onrender.com/
+                  {slugLoja || "sualoja"}
 
-<button
-  className="bg-blue-600 px-3 py-1 rounded-lg"
-  onClick={() =>
-    navigator.clipboard.writeText(
-      usuario.webhookUrl || ""
-    )
-  }
->
-  Copiar
-</button>
+                </div>
 
-  </div>
+                <div className="flex gap-2 mb-3">
 
-</div>
+                  <button
+                    type="button"
+                    className="flex-1 bg-blue-600 py-2 rounded-lg text-xs font-bold"
+                    onClick={() => {
+
+                      if (!slugLoja) {
+                        alert("Digite o nome da loja primeiro");
+                        return;
+                      }
+
+                      window.open(
+                        `https://confirmapix.onrender.com/${slugLoja}`,
+                        "_blank"
+                      );
+
+                    }}
+                  >
+                    🌐 Abrir Página
+                  </button>
+
+                  <button
+                    type="button"
+                    className="flex-1 bg-gray-700 py-2 rounded-lg text-xs font-bold"
+                    onClick={() => {
+
+                      if (!slugLoja) {
+                        alert("Digite o nome da loja primeiro");
+                        return;
+                      }
+
+                      navigator.clipboard.writeText(
+                        `https://confirmapix.onrender.com/${slugLoja}`
+                      );
+
+                      alert("Link copiado!");
+
+                    }}
+                  >
+                    📋 Copiar Link
+                  </button>
+
+                </div>
+
+                <label className="block text-sm font-bold mb-1">
+                  API Key Mercado Pago
+                </label>
+
+                <div className="flex gap-2 mb-3">
+
+                  <input
+                    type={
+                      mostrarApi
+                        ? "text"
+                        : "password"
+                    }
+                    value={apiKey}
+                    onChange={(e) =>
+                      setApiKey(e.target.value)
+                    }
+                    className="flex-1 p-2 rounded-lg bg-[#0d111d]"
+                    placeholder="Cole sua API Key"
+                  />
+
+                  <button
+                    type="button"
+                    className="bg-gray-700 px-3 rounded-lg text-xs"
+                    onClick={() =>
+                      setMostrarApi(!mostrarApi)
+                    }
+                  >
+                    {mostrarApi
+                      ? "Ocultar"
+                      : "Mostrar"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="bg-blue-600 px-3 rounded-lg text-xs"
+                    onClick={() => {
+
+                      if (!apiKey) {
+                        alert("Não existe API Key para copiar");
+                        return;
+                      }
+
+                      navigator.clipboard.writeText(apiKey);
+
+                      alert("API Key copiada!");
+
+                    }}
+                  >
+                    Copiar
+                  </button>
+
+                </div>
+
+                <label className="block text-sm font-bold mb-1">
+                  Webhook
+                </label>
+
+                <div className="bg-[#0d111d] rounded-lg p-2 text-xs break-all mb-2">
+
+                  https://confirmapix.onrender.com/webhook/
+                  {slugLoja || "sualoja"}
+
+                </div>
+
+                <button
+                  type="button"
+                  className="w-full bg-gray-700 py-2 rounded-lg text-xs mb-3"
+                  onClick={() => {
+
+                    if (!slugLoja) {
+                      alert("Digite o nome da loja primeiro");
+                      return;
+                    }
+
+                    navigator.clipboard.writeText(
+                      `https://confirmapix.onrender.com/webhook/${slugLoja}`
+                    );
+
+                    alert("Webhook copiado!");
+
+                  }}
+                >
+                  📋 Copiar Webhook
+                </button>
+
+                <button
+                  type="button"
+                  onClick={salvarConfiguracao}
+                  className="w-full bg-green-600 py-2 rounded-lg font-bold"
+                >
+                  Salvar Configuração
+                </button>
+
+              </div>
+
+            </div>
 
           </div>
 

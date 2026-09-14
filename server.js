@@ -32,6 +32,9 @@ const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
 const dashboardRoutes = require("./routes/dashboard");
 const assinaturaRoutes = require("./routes/assinatura");
+const Assinatura = require("./models/Assinatura");
+const User = require("./models/User");
+const adminRoutes = require("./routes/admin");
 
 
 app.use(express.json());
@@ -40,6 +43,9 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/assinatura", assinaturaRoutes);
+app.use("/admin-api", adminRoutes); 
+
+console.log("🔥 ADMIN API CARREGADA");
 app.get("/teste", (req, res) => {
   res.send("TESTE OK");
 });
@@ -947,15 +953,16 @@ if (!pixData.qr_code || !pixData.qr_code_base64) {
 const copia = pixData.qr_code;
 const base64 = pixData.qr_code_base64;
 
-    await Pagamento.create({
-      valor: valor,
-      status: "pendente",
-      pix: copia,
-      pagamentoId: response.data.id,
-      email: "teste@test.com",
-      slug: loja.slug,
-      merchantId: loja._id
-    });
+   await Pagamento.create({
+  userId: loja.userId,
+  merchantId: loja._id,
+  valor: valor,
+  status: "pendente",
+  pix: copia,
+  pagamentoId: response.data.id,
+  email: "teste@test.com",
+  slug: loja.slug
+});
 
     console.log("✅ SALVO COM SUCESSO");
     console.log("✅ QR GERADO:");
@@ -1226,6 +1233,7 @@ app.post("/webhook", async (req, res) => {
     // SE APROVADO
     if (status === "approved") {
 
+
       const atualizado = await Pagamento.findOneAndUpdate(
         { pagamentoId: Number(paymentId) },
         { status: "aprovado" },
@@ -1234,6 +1242,37 @@ app.post("/webhook", async (req, res) => {
 
       console.log("✅ ATUALIZADO:", atualizado);
     }
+
+    const assinatura = await Assinatura.findOne({
+  pagamentoId: Number(paymentId)
+});
+
+if (assinatura) {
+
+  assinatura.status = "aprovado";
+
+  await assinatura.save();
+
+  const vencimento = new Date();
+
+  vencimento.setDate(
+    vencimento.getDate() + 30
+  );
+
+  await User.findByIdAndUpdate(
+    assinatura.userId,
+    {
+      plano: "pro",
+      statusAssinatura: "ativo",
+      assinaturaExpiraEm: vencimento,
+      ultimoPagamentoEm: new Date()
+    }
+  );
+
+  console.log(
+    "✅ ASSINATURA PRO ATIVADA"
+  );
+}
 
     return res.sendStatus(200);
 

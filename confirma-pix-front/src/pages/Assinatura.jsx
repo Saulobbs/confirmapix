@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export default function Assinatura() {
 
   const [pix, setPix] = useState(null);
+  const [status, setStatus] = useState("pendente");
 
   useEffect(() => {
 
@@ -14,7 +15,72 @@ export default function Assinatura() {
       setPix(JSON.parse(dados));
     }
 
+const pixData = JSON.parse(dados);
+
+setPix(pixData);
+
+const intervalo = setInterval(
+  async () => {
+
+    const response = await fetch(
+      `http://localhost:3000/assinatura/status/${pixData.pagamentoId}`
+    );
+
+    const data =
+      await response.json();
+
+    setStatus(data.status);
+
+   if (
+  dados.status === "approved" ||
+  dados.status === "aprovado"
+) {
+
+  setStatus("aprovado");
+
+  setTimeout(() => {
+    window.location.href = "/dashboard";
+  }, 3000);
+
+}
+
+  },
+  5000
+);
+
   }, []);
+
+if (status === "aprovado") {
+
+  return (
+
+    <div className="min-h-screen bg-[#050816] flex items-center justify-center">
+
+      <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-10 text-center max-w-lg">
+
+        <div className="text-6xl mb-4">
+          ✅
+        </div>
+
+        <h1 className="text-3xl font-black text-green-400 mb-4">
+          Assinatura PRO ativada
+        </h1>
+
+        <p className="text-gray-300">
+          Seu acesso foi liberado.
+        </p>
+
+        <p className="text-yellow-400 mt-4">
+          Redirecionando...
+        </p>
+
+      </div>
+
+    </div>
+
+  );
+
+}
 
   if (!pix) {
 
@@ -67,9 +133,23 @@ export default function Assinatura() {
           Copiar PIX
         </button>
 
-        <div className="mt-6 text-center text-yellow-400">
-          Aguardando pagamento...
-        </div>
+       <div className="mt-6 text-center">
+
+  {status === "aprovado" ? (
+
+    <span className="text-green-400 font-bold">
+      ✅ Pagamento aprovado
+    </span>
+
+  ) : (
+
+    <span className="text-yellow-400">
+      ⏳ Aguardando pagamento...
+    </span>
+
+  )}
+
+</div>
 
       </div>
 

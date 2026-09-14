@@ -11,6 +11,11 @@ const MerchantSchema = new mongoose.Schema({
 
   accessToken: String,
 
+  userId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+},
+
   ativo: {
     type: Boolean,
     default: true

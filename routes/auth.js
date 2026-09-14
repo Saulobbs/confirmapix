@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const Merchant = require("../models/merchant");
 
 const router = express.Router();
 
@@ -148,10 +149,76 @@ router.post("/login", async (req, res) => {
 
     }
 
+    // ============================================================
+// LOGIN ADMINISTRADOR
+// ============================================================
+
+if (
+  email.toLowerCase() ===
+  process.env.ADMIN_USER.toLowerCase()
+) {
+
+  const senhaAdminCorreta =
+    await bcrypt.compare(
+      senha,
+      process.env.ADMIN_PASS_HASH
+    );
+
+  if (!senhaAdminCorreta) {
+
+    return res.status(401).json({
+      erro: "Email ou senha inválidos"
+    });
+
+  }
+
+  const tokenAdmin =
+    jwt.sign(
+      {
+        id: "admin",
+        email: email,
+        role: "admin"
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+  return res.json({
+
+    sucesso: true,
+
+    token: tokenAdmin,
+
+    usuario: {
+
+      id: "admin",
+
+      nome: "Administrador",
+
+      email: email,
+
+      role: "admin",
+
+      plano: "pro",
+
+      statusAssinatura: "ativo"
+
+    }
+
+  });
+
+}
+
     const usuario =
       await User.findOne({
         email
       });
+
+      const loja = await Merchant.findOne({
+  userId: usuario?._id
+});
 
     if (!usuario) {
 
@@ -210,27 +277,27 @@ console.log("LOGIN RESPONSE:");
 
       usuario: {
 
-        id: usuario._id,
+  id: usuario._id,
 
-        nome: usuario.nome,
+  nome: usuario.nome,
 
-        email: usuario.email,
+  email: usuario.email,
 
-        plano: usuario.plano,
+  plano: usuario.plano,
 
-        statusAssinatura: usuario.statusAssinatura,
+  statusAssinatura: usuario.statusAssinatura,
 
-        testeExpiraEm: usuario.testeExpiraEm,
-        
+  testeExpiraEm: usuario.testeExpiraEm,
 
-        
-        apiKey: usuario.apiKey,
-        webhookUrl: usuario.webhookUrl
+  apiKey: usuario.apiKey,
 
+  webhookUrl: usuario.webhookUrl,
 
-          
-        
-      }
+  nomeLoja: loja?.nome || "",
+
+  slugLoja: loja?.slug || ""
+
+}
 
     });
 
@@ -246,41 +313,7 @@ console.log("LOGIN RESPONSE:");
 
 });
 
-function verificarToken(req, res, next) {
 
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({
-      erro: "Token não informado"
-    });
-  }
-
-  try {
-
-    const token = authHeader.replace(
-      "Bearer ",
-      ""
-    );
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-    req.usuario = decoded;
-
-    next();
-
-  } catch (err) {
-
-    return res.status(401).json({
-      erro: "Token inválido"
-    });
-
-  }
-
-}
 
 router.put("/config", verificarToken, async (req, res) => {
 
@@ -289,10 +322,18 @@ console.log(req.body);
 
   try {
 
-    const {
+   const {
   apiKey,
-  webhookUrl
+  webhookUrl,
+  nomeLoja
 } = req.body;
+
+const slugLoja = nomeLoja
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/\s+/g, "")
+  .replace(/[^a-z0-9]/g, "");
 
     console.log("ID RECEBIDO:", req.usuario.id);
     const usuario = await User.findByIdAndUpdate(
@@ -306,13 +347,39 @@ console.log(req.body);
   }
 );
 
+let loja = await Merchant.findOne({
+  userId: usuario._id
+});
+
+if (!loja) {
+
+  loja = await Merchant.create({
+    nome: nomeLoja,
+    slug: slugLoja,
+    accessToken: apiKey,
+    userId: usuario._id
+  });
+
+} else {
+
+  loja.nome = nomeLoja;
+  loja.slug = slugLoja;
+  loja.accessToken = apiKey;
+
+  await loja.save();
+
+}
+
+
 res.json({
   sucesso: true,
   usuario: {
-    id: usuario._id,
-    apiKey: usuario.apiKey,
-    webhookUrl: usuario.webhookUrl
-  }
+  id: usuario._id,
+  apiKey: usuario.apiKey,
+  webhookUrl: usuario.webhookUrl,
+  nomeLoja: loja.nome,
+  slugLoja: loja.slug
+}
 });
 
   } catch (err) {
