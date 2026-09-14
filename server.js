@@ -175,8 +175,7 @@ const LogModel = require("./models/log");
 
 // 🔥 CONEXÃO MONGO
 
-console.log("MONGO_URI:");
-console.log(process.env.MONGO_URI);
+
 
 mongoose.connect(process.env.MONGO_URI)
 
@@ -558,7 +557,7 @@ async (req, res) => {
 
     console.log("NOME:", nome);
     console.log("SLUG:", slug);
-    console.log("TOKEN:", accessToken);
+    
     if (!nome || !slug || !accessToken) {
       return res.send("Preencha todos os campos");
     }

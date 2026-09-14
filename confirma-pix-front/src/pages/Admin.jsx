@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 
 export default function Admin() {
 
-  const [clientes, setClientes] = useState([]);
-  const [estatisticas, setEstatisticas] = useState(null);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState("");
+const [clientes, setClientes] = useState([]);
+const [lojas, setLojas] = useState([]);
+const [estatisticas, setEstatisticas] = useState(null);
+const [carregando, setCarregando] = useState(true);
+const [erro, setErro] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -20,26 +21,34 @@ export default function Admin() {
         Authorization: `Bearer ${token}`
       };
 
-      const [resClientes, resEstatisticas] =
-        await Promise.all([
+     const [resClientes, resEstatisticas, resLojas] =
+  await Promise.all([
 
-          fetch(
-            "http://localhost:3000/admin-api/clientes",
-            { headers }
-          ),
+    fetch(
+      "http://localhost:3000/admin-api/clientes",
+      { headers }
+    ),
 
-          fetch(
-            "http://localhost:3000/admin-api/estatisticas",
-            { headers }
-          )
+    fetch(
+      "http://localhost:3000/admin-api/estatisticas",
+      { headers }
+    ),
 
-        ]);
+    fetch(
+      "http://localhost:3000/admin-api/lojas",
+      { headers }
+    )
+
+  ]);
 
       const dadosClientes =
         await resClientes.json();
 
       const dadosEstatisticas =
         await resEstatisticas.json();
+
+      const dadosLojas =
+        await resLojas.json();
 
       if (!resClientes.ok) {
         throw new Error(
@@ -61,6 +70,10 @@ export default function Admin() {
 
       setEstatisticas(
         dadosEstatisticas
+      );
+
+      setLojas(
+        dadosLojas.lojas || []
       );
 
     } catch (err) {
@@ -629,6 +642,150 @@ export default function Admin() {
           )}
 
         </div>
+
+                {/* ================================================= */}
+        {/* TODAS AS LOJAS */}
+        {/* ================================================= */}
+
+        <div className="bg-[#0d111d] border border-white/10 rounded-3xl overflow-hidden mt-10">
+
+          <div className="p-6 border-b border-white/10">
+
+            <h2 className="text-2xl font-black">
+              🏪 Todas as Lojas
+            </h2>
+
+            <p className="text-gray-400 text-sm mt-1">
+              Todas as lojas cadastradas no ConfirmaPix, incluindo lojas antigas sem cliente vinculado.
+            </p>
+
+          </div>
+
+          {lojas.length === 0 ? (
+
+            <div className="p-10 text-center text-gray-500">
+              Nenhuma loja cadastrada.
+            </div>
+
+          ) : (
+
+            <div className="overflow-x-auto">
+
+              <table className="w-full min-w-[900px]">
+
+                <thead>
+
+                  <tr className="border-b border-white/10 text-left text-gray-400 text-sm">
+
+                    <th className="p-5">
+                      Loja
+                    </th>
+
+                    <th className="p-5">
+                      Cliente
+                    </th>
+
+                    <th className="p-5">
+                      Link
+                    </th>
+
+                    <th className="p-5">
+                      Status
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {lojas.map((loja) => (
+
+                    <tr
+                      key={loja.id}
+                      className="border-b border-white/5 hover:bg-white/[0.02]"
+                    >
+
+                      <td className="p-5">
+
+                        <div className="font-bold">
+                          {loja.nome || "-"}
+                        </div>
+
+                        <div className="text-gray-500 text-sm mt-1">
+                          /{loja.slug}
+                        </div>
+
+                      </td>
+
+                      <td className="p-5">
+
+                        {loja.cliente ? (
+
+                          <>
+                            <div className="font-semibold">
+                              {loja.cliente.nome}
+                            </div>
+
+                            <div className="text-gray-500 text-sm mt-1">
+                              {loja.cliente.email}
+                            </div>
+                          </>
+
+                        ) : (
+
+                          <span className="text-gray-500">
+                            Sem cliente vinculado
+                          </span>
+
+                        )}
+
+                      </td>
+
+                      <td className="p-5">
+
+                        <a
+                          href={`https://confirmapix.onrender.com/${loja.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 text-sm break-all"
+                        >
+                          https://confirmapix.onrender.com/{loja.slug}
+                        </a>
+
+                      </td>
+
+                      <td className="p-5">
+
+                        {loja.ativo ? (
+
+                          <span className="inline-flex px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold">
+                            ATIVA
+                          </span>
+
+                        ) : (
+
+                          <span className="inline-flex px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-bold">
+                            BLOQUEADA
+                          </span>
+
+                        )}
+
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          )}
+
+        </div> 
 
       </div>
 
