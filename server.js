@@ -715,6 +715,28 @@ app.get("/:slug", async (req, res) => {
     return res.send("Loja não encontrada");
   }
 
+  if (loja.ativo === false) {
+  return res.status(403).send(`
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Loja indisponível</title>
+    </head>
+    <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;font-family:Arial;color:white;text-align:center;padding:20px;box-sizing:border-box;">
+      <div style="background:#111827;padding:35px;border-radius:20px;max-width:420px;width:100%;">
+        <div style="font-size:50px;">🔒</div>
+        <h1>Loja indisponível</h1>
+        <p style="color:#cbd5e1;">
+          Esta loja está temporariamente indisponível.
+        </p>
+      </div>
+    </body>
+    </html>
+  `);
+}
+
   res.send(`
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -877,6 +899,13 @@ app.get("/pix/:slug", async (req, res) => {
   if (!loja) {
     return res.send("Loja não encontrada");
   }
+
+  if (loja.ativo === false) {
+  return res.status(403).json({
+    erro: "Loja bloqueada",
+    mensagem: "Esta loja está temporariamente indisponível e não pode gerar novos PIX."
+  });
+}
 
   console.log("LOJA:", loja.nome);
 
