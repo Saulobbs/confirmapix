@@ -862,16 +862,35 @@ router.put(
       }
 
 
-      return res.json({
+      // ========================================================
+// ATIVAR TODAS AS LOJAS VINCULADAS AO CLIENTE
+// ========================================================
 
-        sucesso: true,
+await Merchant.updateMany(
 
-        mensagem:
-          "Cliente ativado com sucesso",
+  {
+    userId: usuario._id
+  },
 
-        cliente: usuario
+  {
+    $set: {
+      ativo: true
+    }
+  }
 
-      });
+);
+
+
+return res.json({
+
+  sucesso: true,
+
+  mensagem:
+    "Cliente e loja ativados com sucesso",
+
+  cliente: usuario
+
+});
 
 
     } catch (err) {
@@ -928,16 +947,35 @@ router.put(
       }
 
 
-      return res.json({
+      // ========================================================
+// BLOQUEAR TODAS AS LOJAS VINCULADAS AO CLIENTE
+// ========================================================
 
-        sucesso: true,
+await Merchant.updateMany(
 
-        mensagem:
-          "Cliente bloqueado com sucesso",
+  {
+    userId: usuario._id
+  },
 
-        cliente: usuario
+  {
+    $set: {
+      ativo: false
+    }
+  }
 
-      });
+);
+
+
+return res.json({
+
+  sucesso: true,
+
+  mensagem:
+    "Cliente e loja bloqueados com sucesso",
+
+  cliente: usuario
+
+});
 
 
     } catch (err) {
