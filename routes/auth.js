@@ -1,11 +1,39 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const User = require("../models/User");
 const Merchant = require("../models/merchant");
 
 const router = express.Router();
+
+// ============================================================
+// CRIPTOGRAFAR ACCESS TOKEN DO MERCADO PAGO
+// ============================================================
+
+function criptografar(texto) {
+
+  const iv = crypto.randomBytes(16);
+
+  const chave = crypto
+    .createHash("sha256")
+    .update(process.env.TOKEN_SECRET)
+    .digest();
+
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    chave,
+    iv
+  );
+
+  let criptografado =
+    cipher.update(texto, "utf8", "hex");
+
+  criptografado += cipher.final("hex");
+
+  return iv.toString("hex") + ":" + criptografado;
+}
 
 
 function verificarToken(req, res, next) {
@@ -356,7 +384,7 @@ if (!loja) {
   loja = await Merchant.create({
     nome: nomeLoja,
     slug: slugLoja,
-    accessToken: apiKey,
+    accessToken: criptografar(apiKey),
     userId: usuario._id
   });
 
@@ -364,7 +392,7 @@ if (!loja) {
 
   loja.nome = nomeLoja;
   loja.slug = slugLoja;
-  loja.accessToken = apiKey;
+  loja.accessToken = criptografar(apiKey);
 
   await loja.save();
 
