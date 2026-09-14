@@ -999,179 +999,934 @@ const base64 = pixData.qr_code_base64;
     console.log("BASE64:", base64 ? "OK" : "ERRO");
   
 
-    // ✅ AQUI É O MAIS IMPORTANTE
-    res.send(`
+   // ============================================================
+// TELA PROFISSIONAL DO PIX
+// ============================================================
+
+res.send(`
 <!DOCTYPE html>
-<html>
+
+<html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIX Gerado</title>
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Pagamento PIX</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg, #141e30, #243b55);
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+* {
+  box-sizing: border-box;
 }
 
-.card {
-  background: #fff;
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #172554 0%,
+      #0f172a 42%,
+      #020617 100%
+    );
+
+  color: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
   padding: 25px;
-  border-radius: 20px;
-  width: 340px;
+
+}
+
+.container {
+
+  width: 100%;
+
+  max-width: 460px;
+
+}
+
+/* ============================================================
+   CABEÇALHO
+============================================================ */
+
+.header {
+
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+
+  margin-bottom: 18px;
+
+}
+
+.logo {
+
+  width: 52px;
+
+  height: 52px;
+
+  margin: 0 auto 12px;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  box-shadow:
+    0 10px 30px rgba(34,197,94,.25);
+
+}
+
+.header h1 {
+
+  margin: 0;
+
+  font-size: 21px;
+
+  font-weight: 700;
+
+}
+
+.header p {
+
+  margin: 7px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+
+}
+
+/* ============================================================
+   CARTÃO PRINCIPAL
+============================================================ */
+
+.card {
+
+  position: relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(30,41,59,.97),
+      rgba(15,23,42,.97)
+    );
+
+  border: 1px solid rgba(148,163,184,.16);
+
+  border-radius: 28px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
+
+  overflow: hidden;
+
+}
+
+.card::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: -100px;
+
+  right: -100px;
+
+  width: 220px;
+
+  height: 220px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(34,197,94,.08);
+
+  filter: blur(5px);
+
+}
+
+/* ============================================================
+   VALOR
+============================================================ */
+
+.label {
+
+  text-align: center;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+
+  margin-bottom: 5px;
+
 }
 
 .valor {
-  font-size: 26px;
-  color: #2ecc71;
-  font-weight: bold;
+
+  text-align: center;
+
+  font-size: 38px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -1px;
+
+  color: #4ade80;
+
+  margin-bottom: 22px;
+
+}
+
+/* ============================================================
+   QR CODE
+============================================================ */
+
+.qr-wrapper {
+
+  background: #ffffff;
+
+  border-radius: 20px;
+
+  padding: 16px;
+
+  width: 100%;
+
+  max-width: 320px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.28);
+
 }
 
 .qr {
-  width: 220px;
-  margin: 15px 0;
+
+  width: 100%;
+
+  max-width: 285px;
+
+  display: block;
+
 }
 
-textarea {
-  width: 100%;
-  height: 70px;
-  margin-top: 10px;
+/* ============================================================
+   INSTRUÇÃO
+============================================================ */
+
+.instrucao {
+
+  text-align: center;
+
+  font-size: 14px;
+
+  color: #cbd5e1;
+
+  margin-bottom: 12px;
+
 }
 
-button {
-  margin-top: 10px;
-  padding: 12px;
+/* ============================================================
+   CÓDIGO PIX
+============================================================ */
+
+.pix-box {
+
+  position: relative;
+
+  background: #020617;
+
+  border: 1px solid #334155;
+
+  border-radius: 14px;
+
+  padding: 14px;
+
+  margin-bottom: 12px;
+
+}
+
+.pix-code {
+
   width: 100%;
+
+  height: 72px;
+
+  resize: none;
+
   border: none;
-  background: #2ecc71;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+
+  font-family: monospace;
+
 }
 
-button:hover {
-  background: #27ae60;
+/* ============================================================
+   BOTÃO COPIAR
+============================================================ */
+
+.btn-copy {
+
+  width: 100%;
+
+  border: none;
+
+  border-radius: 14px;
+
+  padding: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+  box-shadow:
+    0 8px 25px rgba(34,197,94,.22);
+
 }
+
+.btn-copy:hover {
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 12px 30px rgba(34,197,94,.30);
+
+}
+
+.btn-copy:active {
+
+  transform: scale(.98);
+
+}
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status-box {
+
+  margin-top: 18px;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: rgba(30,41,59,.75);
+
+  border: 1px solid rgba(148,163,184,.12);
+
+  text-align: center;
+
+}
+
+.status {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  color: #facc15;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+}
+
+.status-dot {
+
+  width: 9px;
+
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #facc15;
+
+  box-shadow:
+    0 0 12px rgba(250,204,21,.7);
+
+}
+
+/* ============================================================
+   CONTADOR
+============================================================ */
+
+.timer {
+
+  text-align: center;
+
+  margin-top: 8px;
+
+  font-size: 12px;
+
+  color: #64748b;
+
+}
+
+/* ============================================================
+   SEGURANÇA
+============================================================ */
+
+.security {
+
+  margin-top: 18px;
+
+  text-align: center;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+}
+
+.security strong {
+
+  color: #94a3b8;
+
+}
+
+/* ============================================================
+   TELA APROVADO
+============================================================ */
+
+.aprovado {
+
+  text-align: center;
+
+  padding: 20px 5px;
+
+}
+
+.aprovado-icon {
+
+  width: 82px;
+
+  height: 82px;
+
+  margin: 0 auto 20px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 40px;
+
+  background:
+    rgba(34,197,94,.12);
+
+  border: 2px solid #22c55e;
+
+  color: #4ade80;
+
+  box-shadow:
+    0 0 35px rgba(34,197,94,.20);
+
+}
+
+.aprovado h2 {
+
+  margin: 0;
+
+  font-size: 27px;
+
+  color: #4ade80;
+
+}
+
+.aprovado p {
+
+  color: #94a3b8;
+
+  line-height: 1.6;
+
+}
+
+.novo-pix {
+
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 15px;
+
+  border: 1px solid #334155;
+
+  border-radius: 14px;
+
+  background: #1e293b;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+.novo-pix:hover {
+
+  background: #334155;
+
+}
+
+/* ============================================================
+   CELULAR
+============================================================ */
+
+@media (max-width: 480px) {
+
+  body {
+
+    padding: 14px;
+
+  }
+
+  .card {
+
+    padding: 20px;
+
+    border-radius: 22px;
+
+  }
+
+  .valor {
+
+    font-size: 34px;
+
+  }
+
+  .qr-wrapper {
+
+    padding: 12px;
+
+  }
+
+  .qr {
+
+    max-width: 270px;
+
+  }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="card">
-  <div class="valor">R$ ${valor.toFixed(2)}</div>
+<div class="container">
 
-  <img class="qr" src="data:image/png;base64,${base64}" />
+  <div class="header">
 
-  <textarea id="pix">${copia}</textarea>
+    <div class="logo">
+      PIX
+    </div>
 
-  <button onclick="copiar()">Copiar PIX</button>
+    <h1>
+      ${loja.nome}
+    </h1>
+
+    <p>
+      Pagamento seguro via PIX
+    </p>
+
+  </div>
+
+
+  <div class="card" id="card">
+
+    <div class="label">
+      Valor do pagamento
+    </div>
+
+    <div class="valor">
+      R$ ${valor.toFixed(2).replace(".", ",")}
+    </div>
+
+
+    <div class="instrucao">
+
+      Escaneie o QR Code com o aplicativo do seu banco
+
+    </div>
+
+
+    <div class="qr-wrapper">
+
+      <img
+        class="qr"
+        src="data:image/png;base64,${base64}"
+        alt="QR Code PIX"
+      >
+
+    </div>
+
+
+    <div class="pix-box">
+
+      <textarea
+        class="pix-code"
+        id="pix"
+        readonly
+      >${copia}</textarea>
+
+    </div>
+
+
+    <button
+      class="btn-copy"
+      onclick="copiarPIX()"
+      id="btnCopiar"
+    >
+
+      📋 Copiar código PIX
+
+    </button>
+
+
+    <div class="status-box">
+
+      <div class="status" id="status">
+
+        <span class="status-dot"></span>
+
+        <span id="statusTexto">
+          Aguardando pagamento
+        </span>
+
+      </div>
+
+      <div class="timer" id="timer">
+        Expira em 05:00
+      </div>
+
+    </div>
+
+
+    <div class="security">
+
+      🔒 <strong>Pagamento protegido</strong><br>
+
+      Você será avisado automaticamente após a confirmação.
+
+    </div>
+
+  </div>
+
 </div>
+
 
 <script>
 
-// ✅ ID vindo do backend (SÓ UMA VEZ)
 const pagamentoId = "${pagamentoId}";
 
-// ✅ valor como número
-const valor = Number("${valor}");
+const valorPagamento = Number("${valor}");
 
-// 🟢 DATA E HORA
-const agora = new Date();
+let segundosRestantes = 300;
 
-function formatarDataHora(data) {
-  return data.toLocaleString("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "medium"
-  });
-}
+let pagamentoFinalizado = false;
 
-function copiar() {
-  const texto = document.getElementById('pix');
-  texto.select();
-  document.execCommand('copy');
-  alert("Copiado!");
-}
 
-console.log("SCRIPT CARREGOU");
+/* ============================================================
+   COPIAR PIX
+============================================================ */
 
-// status na tela
-const statusText = document.createElement("p");
-statusText.innerText = "⏳ Aguardando pagamento...";
-statusText.style.marginTop = "10px";
-document.querySelector(".card").appendChild(statusText);
+async function copiarPIX() {
 
-async function verificarStatus() {
+  const texto =
+    document.getElementById("pix").value;
+
   try {
-    const response = await fetch('/status/' + pagamentoId);
-    const data = await response.json();
 
-    console.log("STATUS ATUAL:", data.status);
+    await navigator.clipboard.writeText(texto);
 
-    statusText.innerText = "Status: " + data.status;
+  } catch {
 
-    if (data.status === "aprovado") {
-      clearInterval(intervalo);
+    const campo =
+      document.getElementById("pix");
 
-      const card = document.querySelector(".card");   
+    campo.focus();
 
-      card.innerHTML = \`
-      <div style="text-align:center;">
-        <h1 style="color:#2ecc71;">✅ Pagamento Aprovado</h1>
+    campo.select();
 
-        <p>
-          Seu pagamento de 
-          <strong>R$ \${valor.toFixed(2)}</strong> 
-          foi confirmado com sucesso.
-        </p>
+    document.execCommand("copy");
 
-        <p style="margin-top:10px; font-size:14px; color:#555;">
-          📅 \${formatarDataHora(agora)}
-        </p>
+  }
 
-        <button onclick="location.reload()" style="
-          margin-top:20px;
-          padding:12px;
-          border:none;
-          background:#2ecc71;
-          color:white;
-          border-radius:10px;
-          cursor:pointer;
-        ">
-          Gerar novo PIX
-        </button>
-      </div>
-      \`;
+  const botao =
+    document.getElementById("btnCopiar");
+
+  const textoOriginal =
+    botao.innerText;
+
+  botao.innerText =
+    "✓ PIX copiado!";
+
+  setTimeout(() => {
+
+    botao.innerText =
+      textoOriginal;
+
+  }, 2000);
+
+}
+
+
+/* ============================================================
+   CONTADOR
+============================================================ */
+
+function atualizarTimer() {
+
+  const timer =
+    document.getElementById("timer");
+
+  const minutos =
+    Math.floor(segundosRestantes / 60);
+
+  const segundos =
+    segundosRestantes % 60;
+
+  timer.innerText =
+    "Expira em " +
+    String(minutos).padStart(2, "0") +
+    ":" +
+    String(segundos).padStart(2, "0");
+
+  if (segundosRestantes <= 0) {
+
+    timer.innerText =
+      "PIX expirado. Gere um novo PIX.";
+
+  }
+
+}
+
+const contador =
+  setInterval(() => {
+
+    if (segundosRestantes > 0) {
+
+      segundosRestantes--;
+
+      atualizarTimer();
+
     }
 
-  } catch (err) {
-    console.log("ERRO:", err);
-  }
-}
+  }, 1000);
 
-let tentativas = 0;
 
-const intervalo = setInterval(() => {
-  tentativas++;
+/* ============================================================
+   STATUS
+============================================================ */
 
-  if (tentativas > 100) {
-    clearInterval(intervalo);
-    statusText.innerText = "Tempo expirado. Gere um novo PIX.";
+async function verificarStatus() {
+
+  if (pagamentoFinalizado) {
     return;
   }
 
-  verificarStatus();
-}, 3000);
+  try {
+
+    const response =
+      await fetch(
+        "/status/" + pagamentoId
+      );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "STATUS PIX:",
+      data.status
+    );
+
+
+    if (
+      data.status === "approved" ||
+      data.status === "aprovado"
+    ) {
+
+      pagamentoFinalizado = true;
+
+      clearInterval(contador);
+
+      clearInterval(intervaloStatus);
+
+
+      const card =
+        document.getElementById("card");
+
+
+      card.innerHTML = \`
+      
+        <div class="aprovado">
+
+          <div class="aprovado-icon">
+            ✓
+          </div>
+
+          <h2>
+            Pagamento aprovado!
+          </h2>
+
+          <p>
+            Seu pagamento de
+            <strong>
+              R$ \${valorPagamento.toFixed(2).replace(".", ",")}
+            </strong>
+            foi confirmado com sucesso.
+          </p>
+
+          <p>
+            Obrigado pela sua compra.
+          </p>
+
+          <button
+            class="novo-pix"
+            onclick="location.href = location.pathname"
+          >
+            Gerar novo PIX
+          </button>
+
+        </div>
+
+      \`;
+
+      return;
+
+    }
+
+
+    if (
+      data.status === "cancelled" ||
+      data.status === "rejected"
+    ) {
+
+      document.getElementById(
+        "statusTexto"
+      ).innerText =
+        "Pagamento não aprovado";
+
+      document.querySelector(
+        ".status"
+      ).style.color = "#f87171";
+
+      document.querySelector(
+        ".status-dot"
+      ).style.background = "#ef4444";
+
+      return;
+
+    }
+
+  } catch (erro) {
+
+    console.log(
+      "Erro verificando status:",
+      erro
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   VERIFICA A CADA 3 SEGUNDOS
+============================================================ */
+
+const intervaloStatus =
+  setInterval(
+    verificarStatus,
+    3000
+  );
+
+
+atualizarTimer();
+
+verificarStatus();
 
 </script>
 
 </body>
+
 </html>
 `);
     
