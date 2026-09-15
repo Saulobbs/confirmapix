@@ -294,9 +294,12 @@ if (
 
     );
 
-console.log(usuario);
-console.log("LOGIN RESPONSE:");
-
+console.log("✅ LOGIN REALIZADO:", {
+  id: usuario._id,
+  nome: usuario.nome,
+  email: usuario.email,
+  plano: usuario.plano
+});
     return res.json({
 
       sucesso: true,
@@ -345,8 +348,11 @@ console.log("LOGIN RESPONSE:");
 
 router.put("/config", verificarToken, async (req, res) => {
 
-console.log("CONFIG RECEBIDA:");
-console.log(req.body);
+console.log("⚙️ CONFIG RECEBIDA:", {
+  webhookUrl: req.body.webhookUrl,
+  nomeLoja: req.body.nomeLoja,
+  apiKey: req.body.apiKey ? "********" : "não informada"
+});
 
   try {
 
