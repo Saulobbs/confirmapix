@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Admin() {
 
 const [clientes, setClientes] = useState([]);
@@ -25,17 +27,17 @@ const [erro, setErro] = useState("");
   await Promise.all([
 
     fetch(
-      "http://localhost:3000/admin-api/clientes",
+      `${API_URL}/admin-api/clientes`,
       { headers }
     ),
 
     fetch(
-      "http://localhost:3000/admin-api/estatisticas",
+      `${API_URL}/admin-api/estatisticas`,
       { headers }
     ),
 
     fetch(
-      "http://localhost:3000/admin-api/lojas",
+      `${API_URL}/admin-api/lojas`,
       { headers }
     )
 
@@ -122,7 +124,7 @@ const [erro, setErro] = useState("");
 
       const response =
         await fetch(
-          `http://localhost:3000/admin-api/clientes/${cliente.id}/${acao}`,
+          `${API_URL}/admin-api/clientes/${cliente.id}/${acao}`,
           {
             method: "PUT",
             headers: {
@@ -173,7 +175,7 @@ const [erro, setErro] = useState("");
 
       const response =
         await fetch(
-          `http://localhost:3000/admin-api/clientes/${cliente.id}/pro`,
+          `${API_URL}/admin-api/clientes/${cliente.id}/pro`,
           {
             method: "PUT",
             headers: {
@@ -225,7 +227,7 @@ async function excluirFinanceiro(cliente) {
   try {
 
     const response = await fetch(
-      `http://localhost:3000/admin-api/clientes/${cliente.id}/financeiro`,
+      `${API_URL}/admin-api/clientes/${cliente.id}/financeiro`,
       {
         method: "DELETE",
         headers: {
@@ -272,7 +274,7 @@ async function excluirCliente(cliente) {
   try {
 
     const response = await fetch(
-      `http://localhost:3000/admin-api/clientes/${cliente.id}`,
+      `${API_URL}/admin-api/clientes/${cliente.id}`,
       {
         method: "DELETE",
         headers: {
