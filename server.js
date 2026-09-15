@@ -141,15 +141,18 @@ function criptografar(texto) {
   return iv.toString("hex") + ":" + criptografado;
 }
 
-function descriptografar(texto) {
-
+function descriptografarComChave(texto, secret) {
   const partes = texto.split(":");
+
+  if (partes.length !== 2) {
+    throw new Error("Formato de token criptografado inválido.");
+  }
 
   const iv = Buffer.from(partes[0], "hex");
 
   const chave = crypto
     .createHash("sha256")
-    .update(process.env.TOKEN_SECRET)
+    .update(secret)
     .digest();
 
   const decipher = crypto.createDecipheriv(
@@ -158,12 +161,29 @@ function descriptografar(texto) {
     iv
   );
 
-  let descriptografado =
-    decipher.update(partes[1], "hex", "utf8");
+  let descriptografado = decipher.update(
+    partes[1],
+    "hex",
+    "utf8"
+  );
 
   descriptografado += decipher.final("utf8");
 
   return descriptografado;
+}
+
+function descriptografar(texto) {
+  try {
+    return descriptografarComChave(
+      texto,
+      process.env.NEW_TOKEN_SECRET
+    );
+  } catch (erroNovo) {
+    return descriptografarComChave(
+      texto,
+      process.env.TOKEN_SECRET
+    );
+  }
 }
 const Pagamento = require("./models/pagamento");
 
