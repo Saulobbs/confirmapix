@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ativarNotificacoes,
   desativarNotificacoes
-} from "../pushNotifications";
+} from "./pushNotifications";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -480,6 +480,8 @@ async function desativarPush() {
   )}
 
 </div>
+
+
 
         {/* ASSINATURA */}
 
