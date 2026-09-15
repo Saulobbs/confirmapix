@@ -212,6 +212,101 @@ const [erro, setErro] = useState("");
 
   }
 
+async function excluirFinanceiro(cliente) {
+
+  const confirmar = window.confirm(
+    `ATENÇÃO!\n\nDeseja excluir DEFINITIVAMENTE todos os dados financeiros de ${cliente.nome}?\n\nSerão apagados:\n• Pagamentos\n• Assinaturas\n\nO cliente e a loja NÃO serão apagados.\n\nEssa ação NÃO pode ser desfeita.`
+  );
+
+  if (!confirmar) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `http://localhost:3000/admin-api/clientes/${cliente.id}/financeiro`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.erro ||
+        "Erro ao excluir dados financeiros"
+      );
+    }
+
+    alert(
+      `Dados financeiros excluídos com sucesso!\n\nPagamentos excluídos: ${data.pagamentosExcluidos}\nAssinaturas excluídas: ${data.assinaturasExcluidas}`
+    );
+
+    await carregarDados();
+
+  } catch (err) {
+
+    alert(
+      err.message ||
+      "Erro ao excluir dados financeiros"
+    );
+
+  }
+}
+
+async function excluirCliente(cliente) {
+
+  const confirmar = window.confirm(
+    `ATENÇÃO!\n\nDeseja EXCLUIR DEFINITIVAMENTE o cliente ${cliente.nome}?\n\nSerão apagados:\n• Conta do cliente\n• Loja(s) vinculada(s)\n\nOs dados financeiros NÃO serão apagados.\n\nEssa ação NÃO pode ser desfeita.`
+  );
+
+  if (!confirmar) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `http://localhost:3000/admin-api/clientes/${cliente.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.erro ||
+        "Erro ao excluir cliente"
+      );
+    }
+
+    alert(
+      "Cliente e loja(s) excluídos definitivamente."
+    );
+
+    await carregarDados();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Erro ao excluir cliente"
+    );
+
+  }
+}
 
   function formatarData(data) {
 
@@ -623,6 +718,26 @@ const [erro, setErro] = useState("");
                               </button>
 
                             )}
+
+                             {!cliente.ativo && (
+  <button
+    onClick={() =>
+      excluirFinanceiro(cliente)
+    }
+    className="bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 px-3 py-2 rounded-lg text-xs font-bold"
+  >
+    💰 Excluir Financeiro
+  </button>
+)} 
+
+{!cliente.ativo && (
+  <button
+    onClick={() => excluirCliente(cliente)}
+    className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-2 rounded-lg text-xs font-bold"
+  >
+    🗑️ Excluir Cliente
+  </button>
+)}
 
                           </div>
 

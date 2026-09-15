@@ -16,10 +16,10 @@ function criptografar(texto) {
 
   const iv = crypto.randomBytes(16);
 
-  const chave = crypto
-    .createHash("sha256")
-    .update(process.env.TOKEN_SECRET)
-    .digest();
+ const chave = crypto
+  .createHash("sha256")
+  .update(process.env.NEW_TOKEN_SECRET)
+  .digest();
 
   const cipher = crypto.createCipheriv(
     "aes-256-cbc",

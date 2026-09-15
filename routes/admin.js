@@ -1078,6 +1078,119 @@ router.put(
   }
 );
 
+// ============================================================
+// EXCLUIR CLIENTE DEFINITIVAMENTE
+// ============================================================
+
+router.delete(
+  "/clientes/:id",
+  async (req, res) => {
+    try {
+
+      const usuario =
+        await User.findOne({
+          _id: req.params.id,
+          role: "user"
+        });
+
+      if (!usuario) {
+        return res.status(404).json({
+          erro: "Cliente não encontrado"
+        });
+      }
+
+      await Merchant.deleteMany({
+        userId: usuario._id
+      });
+
+      await User.deleteOne({
+        _id: usuario._id
+      });
+
+      return res.json({
+        sucesso: true,
+        mensagem: "Cliente excluído definitivamente"
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      return res.status(500).json({
+        erro: "Erro ao excluir cliente"
+      });
+
+    }
+  }
+);
+
+// ============================================================
+// EXCLUIR DADOS FINANCEIROS DO CLIENTE
+// ============================================================
+
+router.delete(
+  "/clientes/:id/financeiro",
+  async (req, res) => {
+    try {
+
+      const usuario = await User.findOne({
+        _id: req.params.id,
+        role: "user"
+      });
+
+      if (!usuario) {
+        return res.status(404).json({
+          erro: "Cliente não encontrado"
+        });
+      }
+
+      // 🔎 Localiza as lojas desse cliente
+      const lojas = await Merchant.find({
+        userId: usuario._id
+      }).select("_id");
+
+      const idsLojas = lojas.map(
+        loja => loja._id
+      );
+
+      // 🗑️ Exclui pagamentos do cliente
+      const resultadoPagamentos =
+        await Pagamento.deleteMany({
+          $or: [
+            { userId: usuario._id },
+            { merchantId: { $in: idsLojas } }
+          ]
+        });
+
+      // 🗑️ Exclui assinaturas do cliente
+      const resultadoAssinaturas =
+        await Assinatura.deleteMany({
+          userId: usuario._id
+        });
+
+      return res.json({
+        sucesso: true,
+        mensagem: "Dados financeiros excluídos definitivamente",
+        pagamentosExcluidos:
+          resultadoPagamentos.deletedCount,
+        assinaturasExcluidas:
+          resultadoAssinaturas.deletedCount
+      });
+
+    } catch (err) {
+
+      console.error(
+        "❌ ERRO AO EXCLUIR FINANCEIRO:",
+        err
+      );
+
+      return res.status(500).json({
+        erro: "Erro ao excluir dados financeiros"
+      });
+
+    }
+  }
+);
 
 // ============================================================
 // EXPORTAR

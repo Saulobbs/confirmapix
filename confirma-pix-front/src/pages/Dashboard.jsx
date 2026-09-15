@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Dashboard() {
 
   const navigate = useNavigate();
@@ -73,7 +75,7 @@ export default function Dashboard() {
     try {
 
       const response = await fetch(
-        "http://localhost:3000/auth/config",
+        `${API_URL}/auth/config`,
         {
           method: "PUT",
 
@@ -140,7 +142,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://127.0.0.1:3000/dashboard/stats",
+        `${API_URL}/dashboard/stats`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -167,7 +169,7 @@ export default function Dashboard() {
     try {
 
       const response = await fetch(
-        "http://localhost:3000/assinatura/pix",
+        `${API_URL}/assinatura/pix`,
         {
           method: "POST",
 
