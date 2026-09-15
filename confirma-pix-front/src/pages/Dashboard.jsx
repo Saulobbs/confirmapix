@@ -439,6 +439,48 @@ async function desativarPush() {
 
         </div>
 
+        {/* NOTIFICAÇÕES PUSH */}
+
+<div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6 mb-10">
+
+  <h2 className="text-2xl font-bold mb-2">
+    🔔 Notificações
+  </h2>
+
+  <p className="text-gray-400 mb-5">
+    Receba uma notificação quando um PIX for confirmado.
+  </p>
+
+  {notificacoesAtivas ? (
+
+    <button
+      type="button"
+      onClick={desativarPush}
+      disabled={carregandoNotificacoes}
+      className="bg-red-600 px-6 py-3 rounded-xl font-bold"
+    >
+      {carregandoNotificacoes
+        ? "Desativando..."
+        : "🔕 Desativar notificações"}
+    </button>
+
+  ) : (
+
+    <button
+      type="button"
+      onClick={ativarPush}
+      disabled={carregandoNotificacoes}
+      className="bg-blue-600 px-6 py-3 rounded-xl font-bold"
+    >
+      {carregandoNotificacoes
+        ? "Ativando..."
+        : "🔔 Ativar notificações"}
+    </button>
+
+  )}
+
+</div>
+
         {/* ASSINATURA */}
 
         <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6 mb-10">
