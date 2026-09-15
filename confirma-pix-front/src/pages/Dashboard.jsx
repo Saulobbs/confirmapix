@@ -1,9 +1,69 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ativarNotificacoes,
+  desativarNotificacoes
+} from "../pushNotifications";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Dashboard() {
+
+  const [notificacoesAtivas, setNotificacoesAtivas] =
+  useState(
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted"
+  );
+
+const [carregandoNotificacoes, setCarregandoNotificacoes] =
+  useState(false);
+
+async function ativarPush() {
+  try {
+    setCarregandoNotificacoes(true);
+
+    const resultado = await ativarNotificacoes();
+
+    if (resultado?.sucesso) {
+      setNotificacoesAtivas(true);
+    }
+
+  } catch (error) {
+    console.error(
+      "Erro ao ativar notificações:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Não foi possível ativar as notificações."
+    );
+
+  } finally {
+    setCarregandoNotificacoes(false);
+  }
+}
+
+async function desativarPush() {
+  try {
+    setCarregandoNotificacoes(true);
+
+    const resultado = await desativarNotificacoes();
+
+    if (resultado?.sucesso) {
+      setNotificacoesAtivas(false);
+    }
+
+  } catch (error) {
+    console.error(
+      "Erro ao desativar notificações:",
+      error
+    );
+
+  } finally {
+    setCarregandoNotificacoes(false);
+  }
+}
 
   const navigate = useNavigate();
 

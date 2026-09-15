@@ -35,6 +35,15 @@ const assinaturaRoutes = require("./routes/assinatura");
 const Assinatura = require("./models/Assinatura");
 const User = require("./models/User");
 const adminRoutes = require("./routes/admin");
+const pushRoutes = require("./routes/push");
+const webpush = require("web-push");
+const PushSubscription = require("./models/PushSubscription");
+
+webpush.setVapidDetails(
+  process.env.VAPID_SUBJECT,
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
 
 
 app.use(express.json());
@@ -44,6 +53,7 @@ app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/assinatura", assinaturaRoutes);
 app.use("/admin-api", adminRoutes); 
+app.use("/push", pushRoutes);
 
 console.log("🔥 ADMIN API CARREGADA");
 app.get("/teste", (req, res) => {
