@@ -3273,17 +3273,136 @@ app.post("/webhook", async (req, res) => {
     console.log("🔥 STATUS REAL:", status);
 
     // SE APROVADO
-    if (status === "approved") {
+   if (status === "approved") {
 
+  // Verifica se o PIX ainda estava pendente
+  const pagamentoAntes =
+    await Pagamento.findOne({
+      pagamentoId: Number(paymentId)
+    });
 
-      const atualizado = await Pagamento.findOneAndUpdate(
-        { pagamentoId: Number(paymentId) },
-        { status: "aprovado" },
-        { returnDocument: "after" }
+  if (
+    pagamentoAntes &&
+    pagamentoAntes.status !== "aprovado"
+  ) {
+
+    // Atualiza o PIX para aprovado
+    const atualizado =
+      await Pagamento.findOneAndUpdate(
+        {
+          pagamentoId: Number(paymentId)
+        },
+        {
+          status: "aprovado"
+        },
+        {
+          new: true
+        }
       );
 
-      console.log("✅ ATUALIZADO:", atualizado);
+    console.log(
+      "✅ PIX APROVADO:",
+      atualizado
+    );
+
+    // =====================================================
+    // 🔔 NOTIFICAÇÃO PUSH
+    // =====================================================
+
+    try {
+
+      const userId =
+        pagamentoAntes.userId;
+
+      console.log(
+        "🔔 PROCURANDO PUSH DO USUÁRIO:",
+        userId
+      );
+
+      const subscriptions =
+        await PushSubscription.find({
+          userId
+        });
+
+      console.log(
+        "📱 DISPOSITIVOS ENCONTRADOS:",
+        subscriptions.length
+      );
+
+      const payload = JSON.stringify({
+        title: "💰 PIX RECEBIDO",
+        body:
+          `Você recebeu R$ ${Number(
+            pagamentoAntes.valor || 0
+          ).toFixed(2).replace(".", ",")}`,
+        tag:
+          `pix-${paymentId}`,
+        url:
+          "/dashboard"
+      });
+
+      for (const sub of subscriptions) {
+
+        try {
+
+          await webpush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: {
+                p256dh: sub.keys.p256dh,
+                auth: sub.keys.auth
+              }
+            },
+            payload
+          );
+
+          console.log(
+            "✅ PUSH ENVIADO:",
+            sub.endpoint
+          );
+
+        } catch (pushError) {
+
+          console.error(
+            "❌ ERRO AO ENVIAR PUSH:",
+            pushError.statusCode,
+            pushError.message
+          );
+
+          // Remove inscrição inválida/expirada
+          if (
+            pushError.statusCode === 404 ||
+            pushError.statusCode === 410
+          ) {
+
+            await PushSubscription.deleteOne({
+              _id: sub._id
+            });
+
+            console.log(
+              "🗑️ PUSH EXPIRADO REMOVIDO"
+            );
+          }
+        }
+      }
+
+    } catch (pushError) {
+
+      console.error(
+        "❌ ERRO GERAL PUSH:",
+        pushError
+      );
+
     }
+
+  } else {
+
+    console.log(
+      "ℹ️ PIX já estava aprovado. PUSH NÃO REPETIDO."
+    );
+
+  }
+}
 
     const assinatura = await Assinatura.findOne({
   pagamentoId: Number(paymentId)
