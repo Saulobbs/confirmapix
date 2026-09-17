@@ -5,8 +5,14 @@ const PagamentoSchema = new mongoose.Schema({
   status: String,
   pix: String,
   pagamentoId: Number,
-  email: String,
-  slug: String,
+
+// 👤 DADOS DE QUEM PAGOU
+nomePagador: String,
+documentoPagador: String,
+tipoDocumento: String,
+
+email: String,
+slug: String,
 
   merchantId: {
 type: mongoose.Schema.Types.ObjectId,
