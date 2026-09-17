@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Register() {
 
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ export default function Register() {
     try {
 
       const response = await fetch(
-        "/auth/register",
+        `${API_URL}/auth/register`,
         {
           method: "POST",
           headers: {
@@ -38,7 +40,17 @@ export default function Register() {
         }
       );
 
-      const data = await response.json();
+      const texto = await response.text();
+
+let data = {};
+
+try {
+  data = texto ? JSON.parse(texto) : {};
+} catch {
+  data = {
+    erro: texto || "Servidor não retornou uma resposta válida."
+  };
+}
 
       if (!response.ok) {
         throw new Error(
