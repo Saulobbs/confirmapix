@@ -3272,6 +3272,60 @@ app.post("/webhook", async (req, res) => {
 
     console.log("🔥 STATUS REAL:", status);
 
+    // 👤 DADOS DO PAGADOR RETORNADOS PELO MERCADO PAGO
+const payer = response.data.payer || {};
+
+const nomePagador =
+  [payer.first_name, payer.last_name]
+    .filter(Boolean)
+    .join(" ") ||
+  payer.name ||
+  "";
+
+const documentoPagador =
+  payer.identification?.number || "";
+
+const tipoDocumento =
+  payer.identification?.type || "";
+
+const emailPagador =
+  payer.email || "";
+
+// 💾 SALVA SOMENTE OS DADOS QUE EXISTIREM
+const dadosPagador = {};
+
+if (nomePagador) {
+  dadosPagador.nomePagador = nomePagador;
+}
+
+if (documentoPagador) {
+  dadosPagador.documentoPagador = documentoPagador;
+}
+
+if (tipoDocumento) {
+  dadosPagador.tipoDocumento = tipoDocumento;
+}
+
+if (emailPagador) {
+  dadosPagador.email = emailPagador;
+}
+
+if (Object.keys(dadosPagador).length > 0) {
+  await Pagamento.updateOne(
+    { pagamentoId: Number(paymentId) },
+    { $set: dadosPagador }
+  );
+
+  console.log("👤 DADOS DO PAGADOR SALVOS:", {
+    nome: nomePagador || "não informado",
+    documento: documentoPagador || "não informado",
+    tipo: tipoDocumento || "não informado",
+    email: emailPagador || "não informado"
+  });
+} else {
+  console.log("⚠️ MERCADO PAGO NÃO RETORNOU DADOS DO PAGADOR");
+}
+
     // SE APROVADO
    if (status === "approved") {
 
