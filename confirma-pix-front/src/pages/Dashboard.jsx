@@ -584,12 +584,24 @@ async function desativarPush() {
                   </th>
 
                   <th className="text-left py-3">
-                    Email
-                  </th>
+  Pagador
+</th>
 
-                  <th className="text-left py-3">
-                    Data
-                  </th>
+<th className="text-left py-3">
+  CPF/CNPJ
+</th>
+
+<th className="text-left py-3">
+  Tipo
+</th>
+
+<th className="text-left py-3">
+  Email
+</th>
+
+<th className="text-left py-3">
+  Data
+</th>
 
                 </tr>
 
@@ -632,14 +644,26 @@ async function desativarPush() {
                       </td>
 
                       <td className="py-4">
-                        {item.email}
-                      </td>
+  {item.nomePagador || "Não informado"}
+</td>
 
-                      <td className="py-4">
-                        {new Date(
-                          item.criadoEm
-                        ).toLocaleString("pt-BR")}
-                      </td>
+<td className="py-4">
+  {item.documentoPagador || "Não informado"}
+</td>
+
+<td className="py-4">
+  {item.tipoDocumento || "Não informado"}
+</td>
+
+<td className="py-4 break-all">
+  {item.email || "Não informado"}
+</td>
+
+<td className="py-4">
+  {new Date(
+    item.criadoEm
+  ).toLocaleString("pt-BR")}
+</td>
 
                     </tr>
 
