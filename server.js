@@ -3118,7 +3118,7 @@ async function verificarStatus() {
 
           <button
             class="novo-pix"
-            onclick="location.href = location.pathname"
+            onclick="location.href = location.pathname + '?valor=' + encodeURIComponent(valorPagamento.toFixed(2).replace('.', ','))"
           >
             Gerar novo PIX
           </button>
