@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ativarNotificacoes,
@@ -76,6 +76,10 @@ async function desativarPush() {
   const [slugLoja, setSlugLoja] = useState("");
 
   const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [periodo, setPeriodo] = useState("todos");
+  const [buscaTransacao, setBuscaTransacao] = useState("");
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const requestId = useRef(0);
 
   const [stats, setStats] = useState({
     pagamentosHoje: 0,
@@ -83,7 +87,11 @@ async function desativarPush() {
     pixPendentes: 0,
     totalRecebido: 0,
     registrosTotais: 0,
-    ultimasTransacoes: []
+    transacoes: [],
+    paginaAtual: 1,
+    quantidadePorPagina: 20,
+    totalRegistros: 0,
+    totalPaginas: 0
   });
 
   // TRANSFORMA O NOME DA LOJA EM SLUG
@@ -126,7 +134,7 @@ async function desativarPush() {
 
     }
 
-    carregarStats();
+    carregarStats({ periodo: "todos", status: "todos", busca: "", page: 1 });
 
   }, []);
 
@@ -195,14 +203,27 @@ async function desativarPush() {
 
   }
 
-  async function carregarStats() {
+  async function carregarStats({
+    periodo: periodoSelecionado,
+    status: statusSelecionado,
+    busca,
+    page
+  }) {
 
     try {
 
+      const requisicaoAtual = ++requestId.current;
       const token = localStorage.getItem("token");
+      const parametros = new URLSearchParams({
+        periodo: periodoSelecionado,
+        status: statusSelecionado,
+        busca,
+        page: String(page),
+        limit: "20"
+      });
 
       const response = await fetch(
-        `${API_URL}/dashboard/stats`,
+        `${API_URL}/dashboard/stats?${parametros}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -211,6 +232,8 @@ async function desativarPush() {
       );
 
       const data = await response.json();
+
+      if (requisicaoAtual !== requestId.current) return;
 
       console.log("STATS:", data);
 
@@ -280,6 +303,27 @@ async function desativarPush() {
 
   }
 
+  const totalPaginas = stats.totalPaginas || 0;
+  const primeiraPaginaNumerica = Math.max(1, Math.min(paginaAtual - 2, totalPaginas - 4));
+  const paginasVisiveis = Array.from(
+    { length: Math.max(0, Math.min(5, totalPaginas - primeiraPaginaNumerica + 1)) },
+    (_, indice) => primeiraPaginaNumerica + indice
+  );
+  const primeiroRegistro = stats.totalRegistros === 0
+    ? 0
+    : (paginaAtual - 1) * (stats.quantidadePorPagina || 20) + 1;
+  const ultimoRegistro = Math.min(
+    paginaAtual * (stats.quantidadePorPagina || 20),
+    stats.totalRegistros || 0
+  );
+
+  function irParaPagina(pagina) {
+    const destino = Math.min(Math.max(1, pagina), totalPaginas);
+    if (destino === paginaAtual || totalPaginas === 0) return;
+    setPaginaAtual(destino);
+    carregarStats({ periodo, status: filtroStatus, busca: buscaTransacao, page: destino });
+  }
+
   if (!usuario) {
 
     return (
@@ -320,6 +364,30 @@ async function desativarPush() {
         </div>
 
         {/* ESTATÍSTICAS */}
+
+        <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-5 mb-6">
+          <label htmlFor="periodo-dashboard" className="block text-gray-300 font-semibold mb-2">
+            Período das estatísticas e do histórico
+          </label>
+          <select
+            id="periodo-dashboard"
+            value={periodo}
+            onChange={(event) => {
+              const novoPeriodo = event.target.value;
+              setPeriodo(novoPeriodo);
+              setPaginaAtual(1);
+              carregarStats({ periodo: novoPeriodo, status: filtroStatus, busca: buscaTransacao, page: 1 });
+            }}
+            className="bg-[#050816] border border-white/15 rounded-xl px-4 py-3 text-white"
+          >
+            <option value="todos">Tudo</option>
+            <option value="hoje">Hoje</option>
+            <option value="este-mes">Este mês</option>
+            <option value="mes-anterior">Mês anterior</option>
+            <option value="ultimos-7-dias">Últimos 7 dias</option>
+            <option value="ultimos-30-dias">Últimos 30 dias</option>
+          </select>
+        </div>
 
         <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
 
@@ -530,10 +598,14 @@ async function desativarPush() {
             Últimas Transações
           </h2>
 
-          <div className="flex gap-3 mb-6">
+          <div className="flex flex-wrap gap-3 mb-6">
 
             <button
-              onClick={() => setFiltroStatus("todos")}
+              onClick={() => {
+                setFiltroStatus("todos");
+                setPaginaAtual(1);
+                carregarStats({ periodo, status: "todos", busca: buscaTransacao, page: 1 });
+              }}
               className={`px-4 py-2 rounded-xl ${
                 filtroStatus === "todos"
                   ? "bg-blue-600"
@@ -544,7 +616,11 @@ async function desativarPush() {
             </button>
 
             <button
-              onClick={() => setFiltroStatus("aprovado")}
+              onClick={() => {
+                setFiltroStatus("aprovado");
+                setPaginaAtual(1);
+                carregarStats({ periodo, status: "aprovado", busca: buscaTransacao, page: 1 });
+              }}
               className={`px-4 py-2 rounded-xl ${
                 filtroStatus === "aprovado"
                   ? "bg-green-600"
@@ -555,7 +631,11 @@ async function desativarPush() {
             </button>
 
             <button
-              onClick={() => setFiltroStatus("pendente")}
+              onClick={() => {
+                setFiltroStatus("pendente");
+                setPaginaAtual(1);
+                carregarStats({ periodo, status: "pendente", busca: buscaTransacao, page: 1 });
+              }}
               className={`px-4 py-2 rounded-xl ${
                 filtroStatus === "pendente"
                   ? "bg-yellow-600"
@@ -565,6 +645,25 @@ async function desativarPush() {
               Pendentes
             </button>
 
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="busca-transacao" className="block text-gray-300 font-semibold mb-2">
+              Buscar no histórico
+            </label>
+            <input
+              id="busca-transacao"
+              type="search"
+              value={buscaTransacao}
+              onChange={(event) => {
+                const novaBusca = event.target.value;
+                setBuscaTransacao(novaBusca);
+                setPaginaAtual(1);
+                carregarStats({ periodo, status: filtroStatus, busca: novaBusca, page: 1 });
+              }}
+              placeholder="Buscar por valor, status ou data"
+              className="w-full md:max-w-md bg-[#050816] border border-white/15 rounded-xl px-4 py-3 text-white"
+            />
           </div>
 
           <div className="overflow-x-auto">
@@ -594,16 +693,7 @@ async function desativarPush() {
 
               <tbody>
 
-                {stats.ultimasTransacoes
-                  ?.filter((item) => {
-
-                    if (filtroStatus === "todos")
-                      return true;
-
-                    return item.status === filtroStatus;
-
-                  })
-                  .map((item) => (
+                {stats.transacoes?.map((item) => (
 
                     <tr
                       key={item._id}
@@ -638,11 +728,73 @@ async function desativarPush() {
 
                     </tr>
 
-                  ))}
+                ))}
+
+                {stats.transacoes?.length === 0 && (
+                  <tr>
+                    <td colSpan="3" className="py-6 text-center text-gray-400">
+                      Nenhuma transação encontrada para os filtros selecionados.
+                    </td>
+                  </tr>
+                )}
 
               </tbody>
 
             </table>
+
+            <div className="flex flex-col gap-4 mt-6 md:flex-row md:items-center md:justify-between">
+              <p className="text-sm text-gray-400" aria-live="polite">
+                Mostrando {primeiroRegistro}–{ultimoRegistro} de {stats.totalRegistros || 0}
+              </p>
+
+              <nav className="flex flex-wrap items-center gap-2" aria-label="Paginação do histórico">
+                <button
+                  type="button"
+                  onClick={() => irParaPagina(1)}
+                  disabled={paginaAtual <= 1 || totalPaginas === 0}
+                  className="px-3 py-2 rounded-lg bg-gray-700 disabled:opacity-40"
+                >
+                  Primeira página
+                </button>
+                <button
+                  type="button"
+                  onClick={() => irParaPagina(paginaAtual - 1)}
+                  disabled={paginaAtual <= 1 || totalPaginas === 0}
+                  className="px-3 py-2 rounded-lg bg-gray-700 disabled:opacity-40"
+                >
+                  Anterior
+                </button>
+
+                {paginasVisiveis.map((pagina) => (
+                  <button
+                    key={pagina}
+                    type="button"
+                    onClick={() => irParaPagina(pagina)}
+                    aria-current={pagina === paginaAtual ? "page" : undefined}
+                    className={`min-w-10 px-3 py-2 rounded-lg ${pagina === paginaAtual ? "bg-blue-600" : "bg-gray-700"}`}
+                  >
+                    {pagina}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => irParaPagina(paginaAtual + 1)}
+                  disabled={paginaAtual >= totalPaginas || totalPaginas === 0}
+                  className="px-3 py-2 rounded-lg bg-gray-700 disabled:opacity-40"
+                >
+                  Próxima
+                </button>
+                <button
+                  type="button"
+                  onClick={() => irParaPagina(totalPaginas)}
+                  disabled={paginaAtual >= totalPaginas || totalPaginas === 0}
+                  className="px-3 py-2 rounded-lg bg-gray-700 disabled:opacity-40"
+                >
+                  Última página
+                </button>
+              </nav>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-6 mt-8">
 
