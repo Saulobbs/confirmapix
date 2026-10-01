@@ -583,10 +583,7 @@ async function desativarPush() {
                     Status
                   </th>
 
-                  <th className="text-left py-3">
-                    Email
-                  </th>
-
+                 
                   <th className="text-left py-3">
                     Data
                   </th>
@@ -631,9 +628,7 @@ async function desativarPush() {
 
                       </td>
 
-                      <td className="py-4">
-                        {item.email}
-                      </td>
+      
 
                       <td className="py-4">
                         {new Date(
