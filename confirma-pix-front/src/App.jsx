@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import { Recursos, Integracoes, Precos, ApiDocs, Contato } from "./pages/InfoPages";
+import Demonstracao from "./pages/Demonstracao";
 
 export default function App() {
 
@@ -48,6 +50,13 @@ export default function App() {
           path="/assinatura"
           element={<Assinatura />}
         />
+
+        <Route path="/recursos" element={<Recursos />} />
+        <Route path="/integracao" element={<Integracoes />} />
+        <Route path="/precos" element={<Precos />} />
+        <Route path="/api" element={<ApiDocs />} />
+        <Route path="/contato" element={<Contato />} />
+        <Route path="/demonstracao" element={<Demonstracao />} />
 
       </Routes>
 

@@ -13,16 +13,18 @@ import stoneLogo from "../assets/stone.png";
 import pagarmeLogo from "../assets/pagarme.png";
 import asaasLogo from "../assets/asaas.png";
 import { Link } from "react-router-dom";
+import "./HomeResponsive.css";
 
 export default function Home() {
   return (
     <div
-      className="min-h-screen bg-[#050816] text-white overflow-x-hidden"
+      className="home-page min-h-screen bg-[#050816] text-white overflow-x-hidden"
       translate="no"
     >
 
       {/* BLOQUEAR TRADUÇÃO */}
       <meta name="google" content="notranslate" />
+
 
       {/* BACKGROUND */}
       <div className="fixed inset-0">
@@ -36,10 +38,10 @@ export default function Home() {
       {/* NAVBAR */}
       <header className="relative z-10 border-b border-white/10">
 
-        <div className="mx-auto flex w-full min-w-0 max-w-[1700px] flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:flex-wrap md:items-center md:justify-between md:py-6 xl:flex-nowrap xl:px-8">
+        <div className="home-header-inner mx-auto flex w-full min-w-0 max-w-[1700px] flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:flex-wrap md:items-center md:justify-between md:py-6 xl:flex-nowrap xl:px-8">
 
           {/* LOGO */}
-<div className="flex min-w-0 items-center gap-0">
+<div className="home-brand flex min-w-0 items-center gap-0">
 
   <img
     src="/logo.png"
@@ -85,16 +87,16 @@ export default function Home() {
           {/* MENU */}
           <nav aria-label="Navegação principal" className="grid w-full grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-300 md:order-last md:flex md:justify-center md:gap-5 md:text-base xl:order-none xl:w-auto xl:flex-nowrap xl:items-center xl:gap-10 xl:text-[16px] [&>a]:flex [&>a]:min-h-11 [&>a]:items-center [&>a]:rounded-lg [&>a]:px-3 [&>a]:py-2 xl:[&>a]:min-h-0 xl:[&>a]:rounded-none xl:[&>a]:px-0 xl:[&>a]:py-0">
 
-            <a href="#">Recursos</a>
-            <a href="#">Integração</a>
-            <a href="#">Preços</a>
-            <a href="#">API</a>
-            <a href="#">Contato</a>
+            <Link to="/recursos">Recursos</Link>
+            <Link to="/integracao">Integração</Link>
+            <Link to="/precos">Preços</Link>
+            <Link to="/api">API</Link>
+            <Link to="/contato">Contato</Link>
 
           </nav>
 
           {/* BUTTONS */}
-          <div className="flex w-full items-center gap-3 sm:w-auto sm:gap-4">
+          <div className="home-auth flex w-full items-center gap-3 sm:w-auto sm:gap-4">
 
             <Link
   to="/login"
@@ -117,12 +119,12 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 pt-12 pb-12 sm:pt-16 sm:pb-16 xl:pt-24 xl:pb-24">
+      <section className="home-hero relative z-10 pt-12 pb-12 sm:pt-16 sm:pb-16 xl:pt-24 xl:pb-24">
 
-        <div className="mx-auto grid w-full min-w-0 max-w-[1700px] grid-cols-1 items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-2 xl:gap-16 xl:px-8">
+        <div className="home-hero-grid mx-auto grid w-full min-w-0 max-w-[1700px] grid-cols-1 items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-2 xl:gap-16 xl:px-8">
 
           {/* LEFT */}
-          <div className="min-w-0">
+          <div className="home-copy min-w-0">
 
             <div className="mb-6 inline-flex max-w-full items-center gap-3 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-3 sm:mb-8 sm:px-5">
 
@@ -148,7 +150,7 @@ export default function Home() {
             </p>
 
             {/* FEATURES */}
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:mt-14 xl:gap-10">
+            <div className="home-features mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:mt-14 xl:gap-10">
 
               <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0">
 
@@ -195,28 +197,28 @@ export default function Home() {
             </div>
 
             {/* BUTTONS */}
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4 xl:mt-14 xl:gap-5">
+            <div className="home-actions mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4 xl:mt-14 xl:gap-5">
 
-              <button className="w-full rounded-2xl bg-green-400 px-5 py-4 text-lg font-black text-black shadow-[0_0_40px_rgba(34,197,94,.35)] transition-all hover:scale-105 sm:flex-1 sm:px-6 xl:w-auto xl:flex-none xl:px-10 xl:py-5 xl:text-xl">
+              <Link to="/register" className="w-full rounded-2xl bg-green-400 px-5 py-4 text-center text-lg font-black text-black shadow-[0_0_40px_rgba(34,197,94,.35)] transition-all hover:scale-105 sm:flex-1 sm:px-6 xl:w-auto xl:flex-none xl:px-10 xl:py-5 xl:text-xl">
 
                 Começar grátis
 
-              </button>
+              </Link>
 
-              <button className="w-full rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-4 text-lg font-bold text-white transition-all hover:bg-white/[0.06] sm:flex-1 sm:px-6 xl:w-auto xl:flex-none xl:px-10 xl:py-5 xl:text-xl">
+              <Link to="/demonstracao" className="w-full rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-4 text-center text-lg font-bold text-white transition-all hover:bg-white/[0.06] sm:flex-1 sm:px-6 xl:w-auto xl:flex-none xl:px-10 xl:py-5 xl:text-xl">
 
                 Ver demonstração
 
-              </button>
+              </Link>
 
             </div>
 
           </div>
 
           {/* RIGHT */}
-          <div className="w-full min-w-0">
+          <div className="home-demo-wrap w-full min-w-0">
 
-            <div className="min-w-0 rounded-[24px] border border-white/10 bg-[#0d111d]/95 p-4 shadow-[0_0_80px_rgba(34,197,94,.12)] sm:rounded-[30px] sm:p-6 xl:rounded-[36px] xl:p-8">
+            <div className="home-demo min-w-0 rounded-[24px] border border-white/10 bg-[#0d111d]/95 p-4 shadow-[0_0_80px_rgba(34,197,94,.12)] sm:rounded-[30px] sm:p-6 xl:rounded-[36px] xl:p-8">
 
               {/* TOP */}
               <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between xl:mb-8 xl:gap-0">
@@ -240,7 +242,7 @@ export default function Home() {
     draggable="false"
   />
 
-  <div className="hidden xl:flex items-center gap-2">
+  <div className="home-demo-badges hidden xl:flex items-center gap-2">
 
     <div className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
 
@@ -412,13 +414,13 @@ export default function Home() {
 </section>
 
 {/* EM BREVE */}
-<section className="relative z-10 pb-12 sm:pb-16 xl:pb-24">
+<section className="home-integrations relative z-10 pb-12 sm:pb-16 xl:pb-24">
 
   <div className="mx-auto w-full min-w-0 max-w-[1700px] px-4 sm:px-6 xl:px-8">
 
-    <div className="min-w-0 overflow-hidden rounded-[24px] border border-white/10 bg-[#0d111d]/90 sm:rounded-[30px]">
+    <div className="home-integrations-panel min-w-0 overflow-hidden rounded-[24px] border border-white/10 bg-[#0d111d]/90 sm:rounded-[30px]">
 
-      <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="home-integrations-grid grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-5">
 
         {/* LEFT */}
         <div className="flex flex-col justify-center border-b border-white/10 p-6 sm:col-span-2 sm:p-8 xl:col-span-1 xl:border-b-0 xl:border-r xl:p-10">

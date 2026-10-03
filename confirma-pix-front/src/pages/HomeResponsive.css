@@ -1,0 +1,98 @@
+/* Ajustes de escala da Home original. O desktop mantém os estilos existentes. */
+@media (max-width: 1023px) {
+  .home-page header .home-header-inner { gap: 12px; padding-top: 16px; padding-bottom: 16px; }
+  .home-page .home-brand img { max-width: 100%; object-fit: contain; }
+  .home-page .home-brand h1 { line-height: 1; }
+  .home-page .home-auth > a { min-height: 48px; }
+  .home-page .home-header-inner > nav { gap: 7px 9px; }
+  .home-page .home-header-inner > nav > a { min-height: 44px; padding: 8px 12px; }
+
+  .home-page .home-hero { padding-top: 38px; padding-bottom: 40px; }
+  .home-page .home-hero-grid { gap: 30px; }
+  .home-page .home-copy > h1 { font-size: clamp(34px,5vw,48px); line-height: 1.04; }
+  .home-page .home-copy > h2 { font-size: clamp(32px,4.7vw,46px); line-height: 1.05; }
+  .home-page .home-copy > p { max-width: 700px; font-size: clamp(16px,2vw,19px); line-height: 1.6; }
+  .home-page .home-features { gap: 14px; margin-top: 26px; }
+  .home-page .home-features > div { min-width: 0; padding: 17px; }
+  .home-page .home-features h3 { font-size: 18px; }
+  .home-page .home-features p { font-size: 14px; line-height: 1.45; }
+  .home-page .home-actions { gap: 12px; margin-top: 26px; }
+  .home-page .home-actions > :is(button,a) { min-height: 52px; padding-top: 13px; padding-bottom: 13px; }
+
+  .home-page .home-demo { padding: 20px; }
+  .home-page .home-demo-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .home-page .home-demo-badges > div { padding: 6px 9px; }
+  .home-page .home-demo img { max-width: min(100%,160px); height: auto; }
+  .home-page .home-demo > div:nth-child(3) > div { min-width: 0; }
+  .home-page .home-demo > div:nth-child(3) h3 { overflow-wrap: anywhere; }
+  .home-page .home-demo > div:nth-child(4) > div:not(:first-child) { min-width: 0; }
+
+  .home-page .home-integrations { padding-bottom: 42px; }
+  .home-page .home-integrations-panel { width: 100%; }
+  .home-page .home-integrations-grid > div { min-width: 0; }
+  .home-page .home-integrations-grid img { max-width: 100%; object-fit: contain; }
+}
+
+@media (max-width: 767px) {
+  .home-page header .home-header-inner { gap: 12px; padding: 14px 16px; }
+  .home-page .home-brand img { width: 58px; height: 58px; }
+  .home-page .home-brand h1 { font-size: 26px; }
+  .home-page .home-brand p { max-width: 210px; font-size: 8px; letter-spacing: 1.5px; }
+  .home-page .home-auth { gap: 9px; }
+  .home-page .home-auth > a { min-width: 0; min-height: 49px; padding: 10px 9px; font-size: 14px; }
+  .home-page .home-header-inner > nav { gap: 6px; }
+  .home-page .home-header-inner > nav > a { min-width: 0; min-height: 44px; justify-content: center; padding: 7px 5px; font-size: 12px; text-align: center; }
+
+  .home-page .home-hero { padding-top: 30px; padding-bottom: 32px; }
+  .home-page .home-hero-grid { gap: 24px; padding-right: 16px; padding-left: 16px; }
+  .home-page .home-copy > div:first-child { margin-bottom: 19px; padding: 10px 13px; }
+  .home-page .home-copy > div:first-child span { font-size: 11px; }
+  .home-page .home-copy > h1 { font-size: clamp(31px,8.3vw,38px); line-height: 1.04; letter-spacing: -.035em; }
+  .home-page .home-copy > h2 { margin-top: 7px; font-size: clamp(29px,7.7vw,36px); line-height: 1.05; letter-spacing: -.035em; }
+  .home-page .home-copy > p { margin-top: 16px; font-size: 15px; line-height: 1.6; }
+  .home-page .home-features { gap: 10px; margin-top: 21px; }
+  .home-page .home-features > div { padding: 14px; }
+  .home-page .home-features svg { width: 34px; height: 34px; }
+  .home-page .home-features h3 { margin-top: 8px; font-size: 17px; }
+  .home-page .home-features p { margin-top: 3px; font-size: 13px; }
+  .home-page .home-actions { gap: 10px; margin-top: 21px; }
+  .home-page .home-actions > :is(button,a) { min-height: 52px; padding: 12px 15px; font-size: 16px; }
+
+  .home-page .home-demo { padding: 16px; border-radius: 23px; }
+  .home-page .home-demo > div:first-child { gap: 11px; margin-bottom: 18px; }
+  .home-page .home-demo > div:first-child > div:first-child { padding: 8px 11px; }
+  .home-page .home-demo > div:first-child > div:first-child span { font-size: 11px; }
+  .home-page .home-demo > div:first-child > div:nth-child(2) { flex-wrap: wrap; gap: 8px; }
+  .home-page .home-demo img { width: 125px; }
+  .home-page .home-demo-badges { flex-basis: 100%; }
+  .home-page .home-demo-badges span { font-size: 10px; }
+  .home-page .home-demo > div:nth-child(2) { gap: 12px; }
+  .home-page .home-demo > div:nth-child(2) > div:last-child h2 { font-size: 27px; }
+  .home-page .home-demo > div:nth-child(2) > div:last-child p { font-size: 14px; line-height: 1.45; }
+  .home-page .home-demo > div:nth-child(3) { gap: 8px; margin-top: 17px; }
+  .home-page .home-demo > div:nth-child(3) > div { padding: 12px; }
+  .home-page .home-demo > div:nth-child(3) h3 { font-size: 25px; }
+  .home-page .home-demo > div:nth-child(4) { margin-top: 17px; border-radius: 20px; }
+  .home-page .home-demo > div:nth-child(4) > div:first-child { padding: 14px; }
+  .home-page .home-demo > div:nth-child(4) h3 { font-size: 16px; }
+  .home-page .home-demo > div:nth-child(4) > div:not(:first-child) { grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding: 12px; }
+  .home-page .home-demo > div:nth-child(4) > div:not(:first-child) > div:last-child { grid-column: 1 / -1; }
+  .home-page .home-demo > div:nth-child(4) > div:not(:first-child) > span:nth-child(2) { justify-self: end; }
+
+  .home-page .home-integrations { padding-bottom: 28px; }
+  .home-page .home-integrations-panel { border-radius: 22px; }
+  .home-page .home-integrations-grid > div { padding: 21px 15px; }
+  .home-page .home-integrations-grid > div:first-child { padding: 22px 17px; }
+  .home-page .home-integrations-grid > div > img { height: 60px; }
+  .home-page .home-integrations-grid > div > div { margin-top: 12px; }
+}
+
+@media (max-width: 374px) {
+  .home-page header .home-header-inner { padding-right: 12px; padding-left: 12px; }
+  .home-page .home-brand img { width: 52px; height: 52px; }
+  .home-page .home-brand h1 { font-size: 23px; }
+  .home-page .home-brand p { max-width: 185px; font-size: 7px; letter-spacing: 1px; }
+  .home-page .home-header-inner > nav > a { font-size: 11px; }
+  .home-page .home-demo { padding: 13px; }
+  .home-page .home-demo > div:nth-child(3) > div { padding: 9px; }
+}

@@ -1,0 +1,181 @@
+.dashboard-responsive .dashboard-mobile-nav,
+.dashboard-responsive .dashboard-transaction-cards,
+.dashboard-responsive .dashboard-accounts {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  :root:has(.dashboard-responsive),
+  body:has(.dashboard-responsive),
+  #root:has(.dashboard-responsive) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    background-color: #050816;
+  }
+
+  .pix-checkout { padding: 24px !important; }
+  .pix-checkout > div { border-color: rgba(34,211,238,.25); border-radius: 26px; }
+  .pix-checkout img { max-width: min(100%, 280px); height: auto; border-radius: 12px; }
+  .pix-checkout textarea { overflow-wrap: anywhere; }
+  .dashboard-responsive { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 24px !important; }
+  .dashboard-responsive .dashboard-content { width: 100%; max-width: 820px; min-width: 0; box-sizing: border-box; }
+  .dashboard-responsive .dashboard-content > *,
+  .dashboard-responsive .dashboard-stats > *,
+  .dashboard-responsive #dashboard-perfil > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .dashboard-responsive input,
+  .dashboard-responsive select,
+  .dashboard-responsive textarea,
+  .dashboard-responsive table { max-width: 100%; box-sizing: border-box; }
+  .dashboard-responsive .dashboard-mobile-nav {
+    display: flex;
+    position: sticky;
+    z-index: 20;
+    top: 0;
+    justify-content: center;
+    gap: 8px;
+    margin: -24px -24px 28px;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    background: rgba(5,8,22,.94);
+    backdrop-filter: blur(18px);
+  }
+  .dashboard-mobile-nav a {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 0 16px;
+    color: #cbd5e1;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .dashboard-mobile-nav svg { width: 18px; height: 18px; color: #22d3ee; }
+  .dashboard-responsive #dashboard-inicio,
+  .dashboard-responsive #dashboard-pix,
+  .dashboard-responsive #dashboard-contas,
+  .dashboard-responsive #dashboard-historico,
+  .dashboard-responsive #dashboard-perfil { scroll-margin-top: 90px; }
+  .dashboard-responsive .dashboard-stats { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+  .dashboard-responsive .dashboard-stats > div,
+  .dashboard-responsive #dashboard-perfil > div { border-radius: 20px; }
+  .dashboard-responsive .dashboard-stats > div:nth-child(4) { grid-column: span 2; border-color: rgba(34,211,238,.32); background: linear-gradient(120deg,#0d1828,#0d111d); }
+  .dashboard-responsive .dashboard-stats > div:nth-child(4) h3 { color: #22d3ee; font-size: 32px; }
+  .dashboard-responsive .dashboard-history { border-radius: 24px; }
+  .dashboard-responsive .dashboard-accounts {
+    display: block;
+    margin-top: 24px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 24px;
+    background: #0d111d;
+    padding: 24px;
+  }
+  .dashboard-accounts h2 { margin: 0; font-size: 23px; font-weight: 800; }
+  .dashboard-accounts > p { margin: 8px 0 18px; color: #9ca3af; }
+  .dashboard-bank-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+  .dashboard-bank-card { display: flex; min-height: 112px; flex-direction: column; justify-content: center; gap: 7px; border: 1px solid rgba(255,255,255,.1); border-radius: 17px; background: #090d19; padding: 16px; }
+  .dashboard-bank-card svg { width: 20px; height: 20px; color: #22d3ee; }
+  .dashboard-institution-mark { display: flex; height: 24px; align-items: center; }
+  .dashboard-institution-mark img { max-width: 116px; max-height: 24px; object-fit: contain; filter: brightness(0) invert(1); opacity: .72; }
+  .dashboard-bank-card.is-available { border-color: rgba(34,197,94,.32); background: linear-gradient(125deg,rgba(5,55,45,.5),#090d19 72%); }
+  .dashboard-bank-card.is-available .dashboard-institution-mark img { filter: none; opacity: 1; }
+  .dashboard-bank-card strong { font-size: 15px; }
+  .dashboard-bank-card span { color: #9ca3af; font-size: 12px; }
+  .dashboard-bank-card .dashboard-institution-status { width: fit-content; border-radius: 999px; padding: 4px 8px; background: rgba(148,163,184,.1); }
+  .dashboard-bank-card.is-available .dashboard-institution-status { color: #4ade80; background: rgba(34,197,94,.12); }
+  .dashboard-bank-add { border-style: dashed; color: #67e8f9; }
+  .dashboard-bank-add > span:first-child { font-size: 23px; line-height: 20px; }
+  .dashboard-bank-add > span:last-child { color: #9ca3af; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dashboard-responsive .dashboard-content { max-width: 900px; }
+  .dashboard-responsive .dashboard-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dashboard-responsive .dashboard-accounts { padding: 24px; }
+  .dashboard-bank-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dashboard-responsive .dashboard-history > .flex { align-items: center; }
+  .dashboard-responsive #busca-transacao { max-width: 100%; }
+  .dashboard-responsive .dashboard-history table { width: 100%; table-layout: fixed; }
+  .dashboard-responsive .dashboard-history th,
+  .dashboard-responsive .dashboard-history td { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 767px) {
+  .pix-checkout { min-height: 100svh; padding: 20px 16px calc(24px + env(safe-area-inset-bottom)) !important; }
+  .pix-checkout > div { padding: 22px; }
+  .pix-checkout h1 { font-size: 27px; }
+  .pix-checkout h2 { font-size: 32px; }
+  .pix-checkout textarea { min-height: 120px; }
+  .pix-checkout button { min-height: 50px; }
+  .dashboard-responsive { padding: 0 0 calc(94px + env(safe-area-inset-bottom)) !important; }
+  .dashboard-responsive { width: 100%; max-width: 100%; min-width: 0; }
+  .dashboard-responsive .dashboard-content { width: 100%; max-width: 100%; padding: 20px 16px 0; }
+  .dashboard-responsive .dashboard-mobile-nav {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: space-around;
+    gap: 0;
+    margin: 0;
+    padding: 9px 5px calc(9px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255,255,255,.1);
+    border-bottom: 0;
+    background: rgba(8,12,25,.97);
+  }
+  .dashboard-mobile-nav a { min-width: 0; min-height: 54px; flex: 1; flex-direction: column; gap: 3px; border: 0; border-radius: 11px; padding: 4px 2px; font-size: 10px; }
+  .dashboard-mobile-nav svg { width: 20px; height: 20px; }
+  .dashboard-responsive .dashboard-heading { align-items: flex-start; margin-bottom: 22px; }
+  .dashboard-responsive .dashboard-heading h1 { font-size: 32px; }
+  .dashboard-responsive .dashboard-heading p { margin-top: 5px; font-size: 14px; }
+  .dashboard-responsive .dashboard-heading button { padding: 10px 13px; }
+  .dashboard-responsive .dashboard-content > .bg-\[\#0d111d\].mb-6 { margin-bottom: 16px; padding: 16px; }
+  .dashboard-responsive #periodo-dashboard { width: 100%; min-height: 48px; }
+  .dashboard-responsive .dashboard-stats { gap: 10px; margin-bottom: 20px; }
+  .dashboard-responsive .dashboard-stats > div { min-width: 0; padding: 16px; }
+  .dashboard-responsive .dashboard-stats > div p { font-size: 12px; }
+  .dashboard-responsive .dashboard-stats > div h3 { overflow-wrap: anywhere; font-size: 24px; }
+  .dashboard-responsive .dashboard-stats > div:nth-child(4) h3 { font-size: 27px; }
+  .dashboard-responsive #dashboard-perfil { gap: 10px; margin-bottom: 20px; }
+  .dashboard-responsive #dashboard-perfil > div { padding: 15px; }
+  .dashboard-responsive #dashboard-perfil h3 { overflow-wrap: anywhere; font-size: 17px; }
+  .dashboard-responsive #dashboard-pix,
+  .dashboard-responsive #dashboard-historico,
+  .dashboard-responsive .dashboard-accounts { margin-bottom: 18px; border-radius: 21px; padding: 18px; }
+  .dashboard-responsive #dashboard-pix h2,
+  .dashboard-responsive #dashboard-historico h2 { font-size: 20px; }
+  .dashboard-responsive #dashboard-pix button { min-height: 48px; }
+  .dashboard-responsive #dashboard-historico > .flex { gap: 8px; }
+  .dashboard-responsive #dashboard-historico > .flex button { min-height: 42px; padding: 9px 13px; }
+  .dashboard-responsive #busca-transacao { min-height: 48px; }
+  .dashboard-responsive .dashboard-history .overflow-x-auto { overflow: visible; }
+  .dashboard-responsive .dashboard-history table { display: none; }
+  .dashboard-responsive .dashboard-transaction-cards { display: grid; gap: 10px; }
+  .dashboard-transaction-card { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 17px; background: #080c18; padding: 15px; }
+  .dashboard-transaction-card > div { display: flex; flex-direction: column; gap: 5px; }
+  .dashboard-transaction-card > div span { color: #9ca3af; font-size: 12px; }
+  .dashboard-transaction-card > div strong { overflow-wrap: anywhere; font-size: 17px; }
+  .dashboard-transaction-card .dashboard-transaction-date { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.07); padding-top: 9px; }
+  .dashboard-status { border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 700; text-transform: capitalize; }
+  .dashboard-status.is-approved { color: #4ade80; background: rgba(34,197,94,.13); }
+  .dashboard-status.is-pending { color: #facc15; background: rgba(234,179,8,.13); }
+  .dashboard-empty { grid-column: 1/-1; color: #9ca3af; text-align: center; padding: 18px; }
+  .dashboard-responsive .dashboard-history .flex.flex-col.gap-4 { gap: 12px; }
+  .dashboard-responsive .dashboard-history nav[aria-label="Paginação do histórico"] { gap: 6px; }
+  .dashboard-responsive .dashboard-history nav button { min-height: 42px; padding: 8px 10px; font-size: 12px; }
+  .dashboard-bank-grid { grid-template-columns: minmax(0,1fr); }
+}
+
+@media (max-width: 360px) {
+  .dashboard-responsive .dashboard-content { padding-right: 12px; padding-left: 12px; }
+  .dashboard-responsive .dashboard-stats > div { padding: 13px; }
+  .dashboard-mobile-nav a { font-size: 9px; }
+  .dashboard-bank-grid { grid-template-columns: 1fr; }
+}

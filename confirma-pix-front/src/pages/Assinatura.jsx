@@ -94,7 +94,7 @@ if (status === "aprovado") {
 
   return (
 
-    <div className="min-h-screen bg-[#050816] text-white flex items-center justify-center p-8">
+    <div className="pix-checkout min-h-screen bg-[#050816] text-white flex items-center justify-center p-8">
 
       <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-8 max-w-xl w-full">
 

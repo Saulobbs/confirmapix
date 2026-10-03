@@ -1,11 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Home, QrCode, Landmark, History, UserRound } from "lucide-react";
+import "./DashboardResponsive.css";
+import efiLogo from "../assets/efi.png";
+import stoneLogo from "../assets/stone.png";
+import pagarmeLogo from "../assets/pagarme.png";
+import asaasLogo from "../assets/asaas.png";
 import {
   ativarNotificacoes,
   desativarNotificacoes
 } from "./pushNotifications";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const integracoesVisuais = [
+  { nome: "Mercado Pago", status: "Integração disponível", disponivel: true, logo: "https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" },
+  { nome: "CAIXA", status: "Em breve" },
+  { nome: "Bradesco", status: "Em breve" },
+  { nome: "Itaú", status: "Em breve" },
+  { nome: "Santander", status: "Em breve" },
+  { nome: "Nubank", status: "Em breve" },
+  { nome: "EFI", status: "Em breve", logo: efiLogo },
+  { nome: "Stone", status: "Em breve", logo: stoneLogo },
+  { nome: "Pagar.me", status: "Em breve", logo: pagarmeLogo },
+  { nome: "Asaas", status: "Em breve", logo: asaasLogo }
+];
 
 export default function Dashboard() {
 
@@ -336,11 +355,19 @@ async function desativarPush() {
 
   return (
 
-    <div className="min-h-screen bg-[#050816] text-white p-8">
+    <div className="dashboard-responsive min-h-screen bg-[#050816] text-white p-8">
 
-      <div className="max-w-7xl mx-auto">
+      <nav className="dashboard-mobile-nav" aria-label="Navegação do dashboard">
+        <a href="#dashboard-inicio"><Home /><span>Início</span></a>
+        <a href="#dashboard-pix"><QrCode /><span>PIX</span></a>
+        <a href="#dashboard-contas"><Landmark /><span>Contas</span></a>
+        <a href="#dashboard-historico"><History /><span>Histórico</span></a>
+        <a href="#dashboard-perfil"><UserRound /><span>Perfil</span></a>
+      </nav>
 
-        <div className="flex justify-between items-center mb-10">
+      <div className="dashboard-content max-w-7xl mx-auto">
+
+        <div id="dashboard-inicio" className="dashboard-heading flex justify-between items-center mb-10">
 
           <div>
 
@@ -389,7 +416,7 @@ async function desativarPush() {
           </select>
         </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
+        <div className="dashboard-stats grid md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
 
           <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6">
 
@@ -455,7 +482,7 @@ async function desativarPush() {
 
         {/* DADOS DO CLIENTE */}
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+        <div id="dashboard-perfil" className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
 
           <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6">
 
@@ -553,7 +580,7 @@ async function desativarPush() {
 
         {/* ASSINATURA */}
 
-        <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6 mb-10">
+        <div id="dashboard-pix" className="bg-[#0d111d] border border-white/10 rounded-3xl p-6 mb-10">
 
           <h2 className="text-2xl font-bold mb-4">
             Assinatura
@@ -592,7 +619,7 @@ async function desativarPush() {
 
         {/* ÚLTIMAS TRANSAÇÕES */}
 
-        <div className="bg-[#0d111d] border border-white/10 rounded-3xl p-6">
+        <div id="dashboard-historico" className="dashboard-history bg-[#0d111d] border border-white/10 rounded-3xl p-6">
 
           <h2 className="text-2xl font-bold mb-6">
             Últimas Transações
@@ -667,6 +694,17 @@ async function desativarPush() {
           </div>
 
           <div className="overflow-x-auto">
+
+            <div className="dashboard-transaction-cards" aria-label="Transações">
+              {stats.transacoes?.map((item) => (
+                <article key={item._id} className="dashboard-transaction-card">
+                  <div><span>Valor</span><strong>R$ {Number(item.valor || 0).toFixed(2)}</strong></div>
+                  <span className={`dashboard-status ${item.status === "aprovado" ? "is-approved" : "is-pending"}`}>{item.status}</span>
+                  <div className="dashboard-transaction-date"><span>Data e hora</span><strong>{new Date(item.criadoEm).toLocaleString("pt-BR")}</strong></div>
+                </article>
+              ))}
+              {stats.transacoes?.length === 0 && <p className="dashboard-empty">Nenhuma transação encontrada para os filtros selecionados.</p>}
+            </div>
 
             <table className="w-full">
 
@@ -1037,6 +1075,25 @@ async function desativarPush() {
           </div>
 
         </div>
+
+        <section id="dashboard-contas" className="dashboard-accounts" aria-labelledby="dashboard-contas-titulo">
+          <h2 id="dashboard-contas-titulo">Contas e integrações</h2>
+          <p>Mercado Pago é a integração disponível. As demais instituições estão previstas para versões futuras.</p>
+          <div className="dashboard-bank-grid">
+            {integracoesVisuais.map((integracao) => (
+              <article className={`dashboard-bank-card${integracao.disponivel ? " is-available" : ""}`} key={integracao.nome}>
+                <span className="dashboard-institution-mark">
+                  {integracao.logo
+                    ? <img src={integracao.logo} alt="" aria-hidden="true" />
+                    : <Landmark aria-hidden="true" />}
+                </span>
+                <strong>{integracao.nome}</strong>
+                <span className="dashboard-institution-status">{integracao.disponivel ? "✓ " : ""}{integracao.status}</span>
+              </article>
+            ))}
+            <div className="dashboard-bank-card dashboard-bank-add"><span aria-hidden="true">+</span><strong>Adicionar conta</strong><span>Integrações futuras</span></div>
+          </div>
+        </section>
 
       </div>
 
