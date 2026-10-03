@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, QrCode, Landmark, History, UserRound } from "lucide-react";
+import { apiUrl } from "../api";
+import { Home, QrCode, Landmark, History, UserRound, RefreshCw, TrendingUp } from "lucide-react";
 import "./DashboardResponsive.css";
 import efiLogo from "../assets/efi.png";
 import stoneLogo from "../assets/stone.png";
@@ -10,8 +11,6 @@ import {
   ativarNotificacoes,
   desativarNotificacoes
 } from "./pushNotifications";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 const integracoesVisuais = [
   { nome: "Mercado Pago", status: "Integração disponível", disponivel: true, logo: "https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" },
@@ -25,6 +24,137 @@ const integracoesVisuais = [
   { nome: "Pagar.me", status: "Em breve", logo: pagarmeLogo },
   { nome: "Asaas", status: "Em breve", logo: asaasLogo }
 ];
+
+const formatoMoeda = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL"
+});
+const formatoDataSP = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Sao_Paulo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+});
+const nomesPeriodos = {
+  "hoje": "Hoje",
+  "este-mes": "Este mês",
+  "mes-anterior": "Mês anterior",
+  "ultimos-7-dias": "Últimos 7 dias",
+  "ultimos-30-dias": "Últimos 30 dias"
+};
+
+function chaveDataSP(data) {
+  const partes = Object.fromEntries(formatoDataSP.formatToParts(data).map(({ type, value }) => [type, value]));
+  return `${partes.year}-${partes.month}-${partes.day}`;
+}
+
+function chaveDataUTC(data) {
+  return `${data.getUTCFullYear()}-${String(data.getUTCMonth() + 1).padStart(2, "0")}-${String(data.getUTCDate()).padStart(2, "0")}`;
+}
+
+function adicionarDias(chave, quantidade) {
+  const [ano, mes, dia] = chave.split("-").map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia + quantidade));
+  return `${data.getUTCFullYear()}-${String(data.getUTCMonth() + 1).padStart(2, "0")}-${String(data.getUTCDate()).padStart(2, "0")}`;
+}
+
+function obterIntervaloGrafico(periodo, dados) {
+  const hoje = chaveDataSP(new Date());
+  const [ano, mes] = hoje.split("-").map(Number);
+  const inicioMes = `${ano}-${String(mes).padStart(2, "0")}-01`;
+
+  if (periodo === "hoje") return ajustarIntervaloComDados([hoje, hoje], dados);
+  if (periodo === "mes-anterior") {
+    const inicio = new Date(Date.UTC(ano, mes - 2, 1));
+    const fim = new Date(Date.UTC(ano, mes - 1, 0));
+    return ajustarIntervaloComDados([chaveDataUTC(inicio), chaveDataUTC(fim)], dados);
+  }
+  if (periodo === "ultimos-7-dias") return ajustarIntervaloComDados([adicionarDias(hoje, -6), hoje], dados);
+  if (periodo === "ultimos-30-dias") return ajustarIntervaloComDados([adicionarDias(hoje, -29), hoje], dados);
+  if (periodo === "este-mes") return ajustarIntervaloComDados([inicioMes, hoje], dados);
+
+  const datas = dados.map((item) => item.data).filter(Boolean).sort();
+  return [datas[0] || hoje, datas[datas.length - 1] || hoje];
+}
+
+function ajustarIntervaloComDados([inicio, fim], dados) {
+  const datas = dados.map((item) => item.data).filter(Boolean).sort();
+  if (!datas.length) return [inicio, fim];
+  return [datas[0] < inicio ? datas[0] : inicio, datas[datas.length - 1] > fim ? datas[datas.length - 1] : fim];
+}
+
+function graficoDiario(periodo, dados) {
+  const [inicio, fim] = obterIntervaloGrafico(periodo, dados);
+  const totais = new Map(dados.map((item) => [item.data, Number(item.total) || 0]));
+  const dias = [];
+  let data = inicio;
+  while (data <= fim && dias.length < 5000) {
+    dias.push({ chave: data, total: totais.get(data) || 0 });
+    data = adicionarDias(data, 1);
+  }
+  return dias;
+}
+
+function RecebimentosChart({ periodo, dados }) {
+  const serie = graficoDiario(periodo, dados || []);
+  const [selecionado, setSelecionado] = useState(null);
+  const largura = 760;
+  const altura = 240;
+  const esquerda = 64;
+  const direita = 18;
+  const topo = 18;
+  const base = 42;
+  const larguraGrafico = largura - esquerda - direita;
+  const alturaGrafico = altura - topo - base;
+  const maximo = Math.max(0, ...serie.map((item) => item.total));
+  const escalaMaxima = maximo || 1;
+  const passoY = maximo / 4;
+  const pontos = serie.map((item, index) => ({
+    ...item,
+    x: esquerda + (serie.length <= 1 ? larguraGrafico / 2 : (index / (serie.length - 1)) * larguraGrafico),
+    y: topo + alturaGrafico - (item.total / escalaMaxima) * alturaGrafico,
+    rotulo: item.chave.slice(8, 10) + "/" + item.chave.slice(5, 7)
+  }));
+  const linha = pontos.map((ponto, index) => `${index === 0 ? "M" : "L"}${ponto.x},${ponto.y}`).join(" ");
+  const area = pontos.length ? `${linha} L${pontos[pontos.length - 1].x},${topo + alturaGrafico} L${pontos[0].x},${topo + alturaGrafico} Z` : "";
+  const indiceSelecionado = selecionado == null ? pontos.length - 1 : Math.min(selecionado, pontos.length - 1);
+  const pontoSelecionado = pontos[indiceSelecionado];
+  const passoRotulo = Math.max(1, Math.ceil(pontos.length / 7));
+
+  function selecionarPontoPeloPonteiro(event) {
+    if (pontos.length <= 1) return;
+    const limites = event.currentTarget.getBoundingClientRect();
+    const xSvg = ((event.clientX - limites.left) / limites.width) * largura;
+    const xGrafico = Math.max(0, Math.min(larguraGrafico, xSvg - esquerda));
+    setSelecionado(Math.round((xGrafico / larguraGrafico) * (pontos.length - 1)));
+  }
+
+  return (
+    <section className="dashboard-chart-panel" aria-labelledby="recebimentos-grafico-titulo">
+      <div className="dashboard-chart-heading">
+        <div className="dashboard-chart-title"><span><TrendingUp size={20} /></span><div><h2 id="recebimentos-grafico-titulo">Recebimentos por dia</h2><p>Pagamentos aprovados no período selecionado</p></div></div>
+        <span className="dashboard-chart-period">{periodo === "todos" ? "Todo o histórico" : nomesPeriodos[periodo] || periodo}</span>
+      </div>
+      {pontoSelecionado && <div className="dashboard-chart-tooltip" aria-live="polite"><strong>{pontoSelecionado.rotulo}</strong><span>{formatoMoeda.format(pontoSelecionado.total)}</span></div>}
+      <div className="dashboard-chart-viewport">
+        <svg className="dashboard-chart-svg" viewBox={`0 0 ${largura} ${altura}`} role="img" aria-label="Gráfico de linha dos recebimentos aprovados por dia" onPointerMove={selecionarPontoPeloPonteiro} onPointerDown={selecionarPontoPeloPonteiro}>
+          <defs><linearGradient id="dashboard-chart-gradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#22d3ee" stopOpacity=".27" /><stop offset="100%" stopColor="#22d3ee" stopOpacity="0" /></linearGradient></defs>
+          {[0, 1, 2, 3, 4].map((tick) => {
+            const y = topo + (alturaGrafico / 4) * tick;
+            const valor = maximo - passoY * tick;
+            return <g key={tick}><line x1={esquerda} x2={largura - direita} y1={y} y2={y} stroke="rgba(148,163,184,.13)" strokeDasharray="4 5" /><text x={esquerda - 9} y={y + 4} textAnchor="end" className="dashboard-chart-axis">R$ {new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(valor)}</text></g>;
+          })}
+          {area && <path d={area} fill="url(#dashboard-chart-gradient)" />}
+          {linha && <path d={linha} fill="none" stroke="#22d3ee" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />}
+          {pontos.map((ponto, index) => <g key={ponto.chave}><circle className="dashboard-chart-hit-target" cx={ponto.x} cy={ponto.y} r="10" tabIndex="0" role="button" aria-label={`${ponto.rotulo}: ${formatoMoeda.format(ponto.total)}`} onMouseEnter={() => setSelecionado(index)} onFocus={() => setSelecionado(index)} onClick={() => setSelecionado(index)}><title>{ponto.rotulo}: {formatoMoeda.format(ponto.total)}</title></circle><circle cx={ponto.x} cy={ponto.y} r={index === indiceSelecionado ? 5 : 3} fill={index === indiceSelecionado ? "#a5f3fc" : "#22d3ee"} stroke="#08101d" strokeWidth="2" pointerEvents="none" /></g>)}
+          {pontos.map((ponto, index) => index % passoRotulo === 0 || index === pontos.length - 1 ? <text key={`label-${ponto.chave}`} x={ponto.x} y={altura - 12} textAnchor="middle" className="dashboard-chart-axis">{ponto.rotulo}</text> : null)}
+        </svg>
+      </div>
+      {serie.every((item) => item.total === 0) && <p className="dashboard-chart-empty">Sem recebimentos aprovados neste período.</p>}
+      <div className="dashboard-chart-legend"><span><i /> Recebimentos aprovados</span><span>Valores em reais</span></div>
+    </section>
+  );
+}
 
 export default function Dashboard() {
 
@@ -99,6 +229,17 @@ async function desativarPush() {
   const [buscaTransacao, setBuscaTransacao] = useState("");
   const [paginaAtual, setPaginaAtual] = useState(1);
   const requestId = useRef(0);
+  const filtrosAtuais = useRef(null);
+  const atualizacaoManualAtiva = useRef(false);
+  const [atualizandoManualmente, setAtualizandoManualmente] = useState(false);
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState(null);
+
+  filtrosAtuais.current = {
+    periodo,
+    status: filtroStatus,
+    busca: buscaTransacao,
+    page: paginaAtual
+  };
 
   const [stats, setStats] = useState({
     pagamentosHoje: 0,
@@ -162,7 +303,7 @@ async function desativarPush() {
     try {
 
       const response = await fetch(
-        `${API_URL}/auth/config`,
+        apiUrl("/auth/config"),
         {
           method: "PUT",
 
@@ -227,7 +368,13 @@ async function desativarPush() {
     status: statusSelecionado,
     busca,
     page
-  }) {
+  }, { manual = false } = {}) {
+
+    if (manual && atualizacaoManualAtiva.current) return;
+    if (manual) {
+      atualizacaoManualAtiva.current = true;
+      setAtualizandoManualmente(true);
+    }
 
     try {
 
@@ -242,7 +389,7 @@ async function desativarPush() {
       });
 
       const response = await fetch(
-        `${API_URL}/dashboard/stats?${parametros}`,
+        apiUrl(`/dashboard/stats?${parametros}`),
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -253,25 +400,40 @@ async function desativarPush() {
       const data = await response.json();
 
       if (requisicaoAtual !== requestId.current) return;
+      if (!response.ok) throw new Error(data.erro || "Erro ao atualizar o dashboard");
 
       console.log("STATS:", data);
 
       setStats(data);
+      setUltimaAtualizacao(new Date());
 
     } catch (err) {
 
       console.log("ERRO:", err);
 
+    } finally {
+      if (manual) {
+        atualizacaoManualAtiva.current = false;
+        setAtualizandoManualmente(false);
+      }
     }
 
   }
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (!localStorage.getItem("token")) return;
+      carregarStats(filtrosAtuais.current);
+    }, 30000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   async function assinarPro() {
 
     try {
 
       const response = await fetch(
-        `${API_URL}/assinatura/pix`,
+        apiUrl("/assinatura/pix"),
         {
           method: "POST",
 
@@ -414,6 +576,13 @@ async function desativarPush() {
             <option value="ultimos-7-dias">Últimos 7 dias</option>
             <option value="ultimos-30-dias">Últimos 30 dias</option>
           </select>
+          <div className="dashboard-refresh-controls">
+            <span aria-live="polite">{ultimaAtualizacao ? `Atualizado às ${ultimaAtualizacao.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}` : "Aguardando atualização"}</span>
+            <button type="button" onClick={() => carregarStats(filtrosAtuais.current, { manual: true })} disabled={atualizandoManualmente}>
+              <RefreshCw size={15} className={atualizandoManualmente ? "dashboard-refresh-spinning" : ""} />
+              {atualizandoManualmente ? "Atualizando…" : "Atualizar"}
+            </button>
+          </div>
         </div>
 
         <div className="dashboard-stats grid md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
@@ -479,6 +648,15 @@ async function desativarPush() {
           </div>
 
         </div>
+
+        <div className="dashboard-average-card bg-[#0d111d] border border-white/10 rounded-3xl p-6">
+          <p className="text-gray-400">Ticket Médio</p>
+          <h3 className="text-3xl font-bold mt-2 text-cyan-300">
+            {formatoMoeda.format(Number(stats.pixConfirmados) > 0 ? Number(stats.totalRecebido || 0) / Number(stats.pixConfirmados) : 0)}
+          </h3>
+        </div>
+
+        <RecebimentosChart periodo={periodo} dados={stats.recebimentosPorDia || []} />
 
         {/* DADOS DO CLIENTE */}
 

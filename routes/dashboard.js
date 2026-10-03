@@ -101,6 +101,7 @@ router.get("/stats", verificarToken, async (req, res) => {
         pixConfirmados: 0,
         pixPendentes: 0,
         totalRecebido: 0,
+        recebimentosPorDia: [],
         registrosTotais: 0,
         transacoes: [],
         paginaAtual,
@@ -134,7 +135,7 @@ router.get("/stats", verificarToken, async (req, res) => {
     const aprovadosFiltro = { ...filtroPeriodo, status: "aprovado" };
     const pendentesFiltro = { ...filtroPeriodo, status: { $ne: "aprovado" } };
 
-    const [pixConfirmados, pixPendentes, totalRecebido, totalRegistros, transacoes] =
+    const [pixConfirmados, pixPendentes, totalRecebido, totalRegistros, transacoes, recebimentosPorDia] =
       await Promise.all([
         Pagamento.countDocuments(aprovadosFiltro),
         Pagamento.countDocuments(pendentesFiltro),
@@ -146,7 +147,23 @@ router.get("/stats", verificarToken, async (req, res) => {
         Pagamento.find(filtroHistorico)
           .sort({ criadoEm: -1, _id: -1 })
           .skip(pular)
-          .limit(quantidadePorPagina)
+          .limit(quantidadePorPagina),
+        Pagamento.aggregate([
+          { $match: aprovadosFiltro },
+          {
+            $group: {
+              _id: {
+                $dateToString: {
+                  format: "%Y-%m-%d",
+                  date: "$criadoEm",
+                  timezone: "America/Sao_Paulo"
+                }
+              },
+              total: { $sum: "$valor" }
+            }
+          },
+          { $sort: { _id: 1 } }
+        ])
       ]);
 
     res.json({
@@ -155,6 +172,7 @@ router.get("/stats", verificarToken, async (req, res) => {
       pixConfirmados,
       pixPendentes,
       totalRecebido: totalRecebido[0]?.total || 0,
+      recebimentosPorDia: recebimentosPorDia.map(({ _id, total }) => ({ data: _id, total })),
       registrosTotais: pixConfirmados + pixPendentes,
       transacoes,
       paginaAtual,

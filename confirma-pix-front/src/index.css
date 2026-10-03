@@ -1,1 +1,60 @@
 @import "tailwindcss";
+
+/* Pequenas telas: estilos restritos às páginas de autenticação e checkout PIX. */
+@media (max-width: 767px) {
+  .auth-responsive {
+    min-height: 100vh;
+    min-height: 100svh;
+    box-sizing: border-box;
+    padding: 16px;
+  }
+
+  .auth-responsive-card {
+    width: 100%;
+    max-width: 28rem;
+    box-sizing: border-box;
+    padding: 24px;
+  }
+
+  .auth-responsive-card h1 {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+  }
+
+  .auth-responsive-card input,
+  .auth-responsive-card button {
+    box-sizing: border-box;
+    min-height: 48px;
+  }
+
+  .pix-checkout > div {
+    width: 100%;
+    max-width: 36rem;
+    box-sizing: border-box;
+    padding: 18px;
+  }
+
+  .pix-checkout img {
+    width: min(100%, 280px);
+    max-height: 280px;
+    object-fit: contain;
+  }
+
+  .pix-checkout textarea {
+    width: 100%;
+    min-height: 112px;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 12px;
+  }
+
+  .pix-checkout button {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 374px) {
+  .auth-responsive { padding: 12px; }
+  .auth-responsive-card { padding: 20px; }
+  .pix-checkout > div { padding: 16px; }
+}

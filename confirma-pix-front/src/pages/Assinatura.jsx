@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "../api";
 
 export default function Assinatura() {
 
@@ -23,7 +24,7 @@ const intervalo = setInterval(
   async () => {
 
     const response = await fetch(
-      `http://localhost:3000/assinatura/status/${pixData.pagamentoId}`
+      apiUrl(`/assinatura/status/${pixData.pagamentoId}`)
     );
 
     const data =

@@ -4,6 +4,34 @@
   display: none;
 }
 
+.dashboard-refresh-controls { display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-top:13px; }
+.dashboard-refresh-controls > span { color:#8f9caf; font-size:12px; }
+.dashboard-refresh-controls button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:7px; border:1px solid rgba(34,211,238,.24); border-radius:10px; background:rgba(6,182,212,.09); padding:0 13px; color:#62d8e9; font-size:12px; font-weight:750; cursor:pointer; transition:all .2s; }
+.dashboard-refresh-controls button:hover:not(:disabled) { border-color:rgba(34,211,238,.5); background:rgba(6,182,212,.16); }
+.dashboard-refresh-controls button:disabled { cursor:wait; opacity:.68; }
+.dashboard-refresh-spinning { animation:dashboard-refresh-spin 1s linear infinite; }
+@keyframes dashboard-refresh-spin { to { transform:rotate(360deg); } }
+.dashboard-chart-panel { min-width:0; max-width:100%; box-sizing:border-box; margin:0 0 32px; overflow:hidden; border:1px solid rgba(255,255,255,.1); border-radius:24px; background:linear-gradient(145deg,#0d111d,#0a1020); padding:24px; }
+.dashboard-chart-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.dashboard-chart-title { display:flex; min-width:0; align-items:center; gap:13px; }
+.dashboard-chart-title > span { display:grid; width:42px; height:42px; flex:none; place-items:center; border:1px solid rgba(34,211,238,.2); border-radius:13px; background:rgba(6,182,212,.09); color:#39cfe5; }
+.dashboard-chart-title h2 { margin:0; font-size:20px; font-weight:800; }
+.dashboard-chart-title p { margin:5px 0 0; color:#8f9caf; font-size:12px; }
+.dashboard-chart-period { flex:none; border:1px solid rgba(148,163,184,.14); border-radius:999px; background:rgba(255,255,255,.03); padding:7px 11px; color:#aab6c6; font-size:11px; }
+.dashboard-chart-tooltip { display:flex; align-items:center; gap:10px; width:fit-content; max-width:100%; margin:17px 0 3px 56px; border:1px solid rgba(34,211,238,.17); border-radius:10px; background:rgba(5,15,27,.8); padding:8px 11px; font-size:12px; }
+.dashboard-chart-tooltip strong { color:#a5f3fc; }
+.dashboard-chart-tooltip span { color:#e8f1f8; font-weight:750; }
+.dashboard-chart-viewport { width:100%; max-width:100%; min-width:0; overflow:hidden; }
+.dashboard-chart-svg { display:block; width:100%; height:auto; overflow:visible; }
+.dashboard-chart-axis { fill:#8492a6; font-size:11px; font-family:inherit; }
+.dashboard-chart-hit-target { fill:transparent; stroke:transparent; cursor:pointer; outline:none; }
+.dashboard-chart-hit-target:focus { fill:rgba(34,211,238,.14); stroke:rgba(34,211,238,.48); }
+.dashboard-chart-empty { margin:0; color:#909db0; font-size:12px; text-align:center; }
+.dashboard-chart-legend { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:6px 0 0 56px; color:#7f8da1; font-size:10px; }
+.dashboard-chart-legend > span:first-child { display:flex; align-items:center; gap:7px; }
+.dashboard-chart-legend i { width:8px; height:8px; border-radius:50%; background:#22d3ee; box-shadow:0 0 10px rgba(34,211,238,.55); }
+.dashboard-average-card { width:min(330px,100%); box-sizing:border-box; margin:-12px 0 24px auto; }
+
 @media (max-width: 1023px) {
   :root:has(.dashboard-responsive),
   body:has(.dashboard-responsive),
@@ -140,9 +168,26 @@
   .dashboard-responsive #periodo-dashboard { width: 100%; min-height: 48px; }
   .dashboard-responsive .dashboard-stats { gap: 10px; margin-bottom: 20px; }
   .dashboard-responsive .dashboard-stats > div { min-width: 0; padding: 16px; }
+  .dashboard-responsive .dashboard-stats > div:nth-child(5) { grid-column: 2; grid-row: 2; }
+  .dashboard-responsive .dashboard-stats > div:nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
   .dashboard-responsive .dashboard-stats > div p { font-size: 12px; }
   .dashboard-responsive .dashboard-stats > div h3 { overflow-wrap: anywhere; font-size: 24px; }
   .dashboard-responsive .dashboard-stats > div:nth-child(4) h3 { font-size: 27px; }
+  .dashboard-responsive .dashboard-average-card h3 { font-size: 22px; }
+  .dashboard-responsive .dashboard-average-card { width:100%; margin:-6px 0 18px; padding:16px; }
+  .dashboard-responsive .dashboard-refresh-controls { justify-content:space-between; gap:8px; }
+  .dashboard-responsive .dashboard-refresh-controls > span { font-size:10px; }
+  .dashboard-responsive .dashboard-refresh-controls button { min-height:42px; padding:0 11px; }
+  .dashboard-chart-panel { margin-bottom:20px; border-radius:21px; padding:16px; }
+  .dashboard-chart-heading { align-items:flex-start; flex-direction:column; }
+  .dashboard-chart-title { gap:10px; }
+  .dashboard-chart-title > span { width:37px; height:37px; }
+  .dashboard-chart-title h2 { font-size:17px; }
+  .dashboard-chart-title p { font-size:10px; }
+  .dashboard-chart-period { margin-left:47px; }
+  .dashboard-chart-tooltip { margin:12px 0 4px 0; }
+  .dashboard-chart-legend { margin-left:0; font-size:9px; }
+  .dashboard-chart-axis { font-size:10px; }
   .dashboard-responsive #dashboard-perfil { gap: 10px; margin-bottom: 20px; }
   .dashboard-responsive #dashboard-perfil > div { padding: 15px; }
   .dashboard-responsive #dashboard-perfil h3 { overflow-wrap: anywhere; font-size: 17px; }
@@ -176,6 +221,10 @@
 @media (max-width: 360px) {
   .dashboard-responsive .dashboard-content { padding-right: 12px; padding-left: 12px; }
   .dashboard-responsive .dashboard-stats > div { padding: 13px; }
+  .dashboard-responsive .dashboard-average-card h3 { font-size:20px; }
+  .dashboard-responsive .dashboard-average-card { padding:13px; }
+  .dashboard-chart-panel { padding:13px 10px; }
+  .dashboard-chart-legend { font-size:8px; }
   .dashboard-mobile-nav a { font-size: 9px; }
   .dashboard-bank-grid { grid-template-columns: 1fr; }
 }

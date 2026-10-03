@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiUrl } from "../api";
 
 export default function Login() {
 
@@ -20,7 +19,7 @@ export default function Login() {
     try {
 
       const response = await fetch(
-        `${API_URL}/auth/login`,
+        apiUrl("/auth/login"),
         {
           method: "POST",
 
@@ -103,11 +102,11 @@ export default function Login() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-[#0B1020]">
+    <div className="auth-responsive min-h-screen flex items-center justify-center bg-[#0B1020]">
 
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-md p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur"
+        className="auth-responsive-card w-full max-w-md p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur"
       >
 
         <h1 className="text-4xl font-bold text-white mb-2">

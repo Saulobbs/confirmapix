@@ -12,7 +12,22 @@ export default defineConfig({
   server: {
     proxy: {
 
+      "/dashboard/stats": {
+        target: "http://localhost:3000",
+        changeOrigin: true
+      },
+
       "/auth": {
+        target: "http://localhost:3000",
+        changeOrigin: true
+      },
+
+      "/admin-api": {
+        target: "http://localhost:3000",
+        changeOrigin: true
+      },
+
+      "/assinatura": {
         target: "http://localhost:3000",
         changeOrigin: true
       }

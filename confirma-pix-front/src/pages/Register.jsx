@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../api";
 
 export default function Register() {
 
@@ -24,7 +25,7 @@ export default function Register() {
     try {
 
       const response = await fetch(
-        "/auth/register",
+        apiUrl("/auth/register"),
         {
           method: "POST",
           headers: {
@@ -67,9 +68,9 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050816] flex items-center justify-center px-6">
+    <div className="auth-responsive min-h-screen bg-[#050816] flex items-center justify-center px-6">
 
-      <div className="w-full max-w-md bg-[#0d111d] border border-white/10 rounded-3xl p-8">
+      <div className="auth-responsive-card w-full max-w-md bg-[#0d111d] border border-white/10 rounded-3xl p-8">
 
         <h1 className="text-4xl font-black text-white mb-2">
           Criar conta
